@@ -1,6 +1,7 @@
 package main.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,10 +11,10 @@ public class User {
 
     @Id
     @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1) NOT NULL")
+    @Column(name = "is_moderator", columnDefinition = "TINYINT(1) NOT NULL")
     private Boolean isModerator;
 
     @Column(name = "reg_time", nullable = false)
@@ -26,7 +27,7 @@ public class User {
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String password;
 
-    @Column(name = "code", columnDefinition = "VARCHAR(255) NOT NULL")
+    @Column(name = "code", columnDefinition = "VARCHAR(255)")
     private String recoveryCode;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
@@ -36,7 +37,17 @@ public class User {
     private String photoLink;
 
     @ManyToMany(mappedBy = "moderators")
-    private List<Post> moderatedPosts;
+    private List<Post> moderatedPosts = new ArrayList<>();
+
+    public User(Boolean isModerator, Date registrationDate, String name, String password, String email) {
+        this.isModerator = isModerator;
+        this.registrationDate = registrationDate;
+        this.name = name;
+        this.password = password;
+        this.email = email;
+    }
+
+    public User() {}
 
     public List<Post> getModeratedPosts() {
         return moderatedPosts;
@@ -108,5 +119,20 @@ public class User {
 
     public void setPhotoLink(String photoLink) {
         this.photoLink = photoLink;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", isModerator=" + isModerator +
+                ", registrationDate=" + registrationDate +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", recoveryCode='" + recoveryCode + '\'' +
+                ", email='" + email + '\'' +
+                ", photoLink='" + photoLink + '\'' +
+                ", moderatedPosts=" + moderatedPosts +
+                '}';
     }
 }

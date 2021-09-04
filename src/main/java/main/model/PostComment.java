@@ -8,7 +8,7 @@ import java.util.Date;
 public class PostComment {
     @Id
     @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
@@ -29,6 +29,14 @@ public class PostComment {
 
     @Column(nullable = false)
     private String text;
+
+    public PostComment(Post post, User user, Date commentTime, String text) {
+        this.post = post;
+        this.user = user;
+        this.commentTime = commentTime;
+        this.text = text;
+    }
+
 
     public int getId() {
         return id;

@@ -10,14 +10,14 @@ public class Post {
 
     @Id
     @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "is_active", columnDefinition = "TINYINT(1) NOT NULL")
+    @Column(name = "is_active", columnDefinition = "TINYINT NOT NULL")
     private boolean isActive;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum('NEW' , 'ACCEPTED', 'DECLINED') NOT NULL")
+    @Column(name = "moderation_status", columnDefinition = "enum('NEW' , 'ACCEPTED', 'DECLINED') NOT NULL")
     private ModerationStatus moderationStatus;
 
     @ManyToMany
@@ -42,6 +42,18 @@ public class Post {
 
     @Column(name = "view_count", columnDefinition = "INT NOT NULL")
     private int countOfView;
+
+    public Post(boolean isActive, ModerationStatus moderationStatus, User user, Date publicationTime, String tittle, String text, int countOfView) {
+        this.isActive = isActive;
+        this.moderationStatus = moderationStatus;
+        this.user = user;
+        this.publicationTime = publicationTime;
+        this.tittle = tittle;
+        this.text = text;
+        this.countOfView = countOfView;
+    }
+
+    public Post() {}
 
     public int getId() {
         return id;
@@ -73,6 +85,14 @@ public class Post {
 
     public void setModerators(List<User> moderators) {
         this.moderators = moderators;
+        for (User moderator: moderators){
+            moderator.getModeratedPosts().add(this);
+        }
+    }
+
+    public void addModerator(User user) {
+        moderators.add(user);
+        user.getModeratedPosts().add(this);
     }
 
     public User getUser() {
@@ -115,8 +135,4 @@ public class Post {
         this.countOfView = countOfView;
     }
 
-}
-
-enum ModerationStatus{
-    NEW, ACCEPTED, DECLINED
 }
