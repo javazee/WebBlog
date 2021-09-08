@@ -1,4 +1,3 @@
-import junit.framework.TestCase;
 import main.model.ModerationStatus;
 import main.model.Post;
 import main.model.PostComment;
@@ -10,7 +9,9 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.Query;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class HibernateTest extends TestCase {
+public class HibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
     private static User user;
@@ -27,8 +28,8 @@ public class HibernateTest extends TestCase {
     private static Post post2;
     private static PostComment postComment;
 
-    @Override
-    protected void setUp() {
+    @Before
+    public void setUp() {
         StandardServiceRegistry registry = new StandardServiceRegistryBuilder().
                 configure("hibernate.cfg.xml").build();
         Metadata metadata = new MetadataSources(registry).getMetadataBuilder().build();
@@ -74,8 +75,8 @@ public class HibernateTest extends TestCase {
         Assert.assertEquals("I like it", postComment.getText());
     }
 
-    @Override
-    protected void tearDown() {
+    @After
+    public void tearDown() {
         Transaction transaction = session.beginTransaction();
         session.delete(postComment);
         session.delete(post);

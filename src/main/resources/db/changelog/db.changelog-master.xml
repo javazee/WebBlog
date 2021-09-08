@@ -233,12 +233,35 @@
         </insert>
         <insert tableName="posts">
             <column name="is_active" value="1"/>
-            <column name="moderation_status" value="NEW"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2018-12-12"/>
-            <column name="text" value="something useful and interesting information"/>
-            <column name="tittle" value="tittle"/>
-            <column name="view_count" value="2"/>
+            <column name="text" value="Java-это объектно-ориентированный язык программирования, разработанный компанией Sun Microsystems в 1990-х годах (позже купленной Oracle).
+
+Понятие «объектно-ориентированный» относится к способу написания структурного кода Java, а именно: разделение кода на так называемые «классы»,
+которые запускаются вместе, чтобы обеспечить согласованное порождение объектов. Мы обсудим это позже, но достаточно сказать,
+что это приводит к универсальному и организованному коду, который легко редактировать и перепрофилировать.
+Java находится под влиянием C и C++, поэтому она имеет много общего с этими языками (и C#). Одним из больших преимуществ Java является то, 
+что он «платформенно-независимый». Это означает, что код, который вы пишете на одной платформе, можно легко запустить на другой. 
+Это называется принципом «пишем один раз, запускаем где угодно» (хотя на практике это не всегда так просто, как кажется).
+
+Чтобы запустить и использовать Java, вам нужно три вещи:
+
+JDK – Java Development Kit
+JRE – Java Runtime Environment
+JVM – Java Virtual Machine
+
+Виртуальная машина Java (JVM) гарантирует, что у ваших приложений Java есть доступ к минимальным ресурсам, необходимым для их запуска. 
+Именно благодаря JVM программы Java так легко запускаются на разных платформах.
+
+Среда исполнения Java (JRE) предоставляет собой «контейнер» для всех этих элементов и кода для запуска приложения. 
+JDK – это «компилятор», который интерпретирует сам код и выполняет его. В JDK также есть инструменты разработчика, 
+необходимые для написания кода Java (как и следует из названия).
+
+Хорошая новость заключается в том, что разработчикам нужно только позаботиться о загрузке JDK, 
+поскольку он поставляется вместе с двумя другими компонентами."/>
+            <column name="tittle" value="Что такое Java?"/>
+            <column name="view_count" value="199"/>
         </insert>
         <insert tableName="moderator_posts">
             <column name="moderator_id" value="3"/>
@@ -248,26 +271,35 @@
             <column name="post_id" value="1"/>
             <column name="user_id" value="2"/>
             <column name="time" value="2018-12-13"/>
-            <column name="text" value="where information?"/>
+            <column name="text" value="nothing is clear, but it is very interesting"/>
         </insert>
         <insert tableName="post_comments">
             <column name="post_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2018-12-14"/>
-            <column name="text" value="will be added soon"/>
+            <column name="text" value="YI don't understand it myself"/>
             <column name="parent_id" value="1"/>
         </insert>
         <insert tableName="post_votes">
             <column name="post_id" value="1"/>
             <column name="user_id" value="3"/>
             <column name="time" value="2018-12-12"/>
-            <column name="value" value="-1"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="1"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2018-12-12"/>
+            <column name="value" value="1"/>
         </insert>
         <insert tableName="tags">
             <column name="text" value="java"/>
         </insert>
         <insert tableName="tags">
-            <column name="text" value="investments"/>
+            <column name="text" value="git"/>
+        </insert>
+        <insert tableName="tags">
+            <column name="text" value="career"/>
         </insert>
         <insert tableName="tag2post">
             <column name="tag_id" value="1"/>
@@ -277,6 +309,418 @@
             <column name="time" value="2018-05-06"/>
             <column name="secret_code" value="sad4v65"/>
             <column name="code" value="space oddity"/>
+        </insert>
+    </changeSet>
+    <changeSet id="21" author="eduard">
+        <insert tableName="global_settings">
+            <column name="code" value="MULTIUSER_MODE"/>
+            <column name="name" value="Многопользовательский режим"/>
+            <column name="value" value="YES"/>
+        </insert>
+        <insert tableName="global_settings">
+            <column name="code" value="POST_PREMODERATION"/>
+            <column name="name" value="Премодерация постов"/>
+            <column name="value" value="NO"/>
+        </insert>
+        <insert tableName="global_settings">
+            <column name="code" value="STATISTICS_IS_PUBLIC"/>
+            <column name="name" value="Показывать всем статистику блога"/>
+            <column name="value" value="YES"/>
+        </insert>
+    </changeSet>
+    <changeSet id="22" author="eduard">
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2018-12-13"/>
+            <column name="text" value="Если вы планируете разрабатывать приложения на Java на своем настольном компьютере,
+то вам нужно будет загрузить и установить JDK.
+
+Вы можете получить последнюю версию JDK непосредственно с сайта Oracle. Как только вы установите его,
+ваш компьютер будет иметь возможность понимать и запускать код на Java. Тем не менее, вам все равно понадобится некоторое вспомогательное ПО,
+чтобы было действительно удобно писать код. Это так называемая «интегрированная среда разработки» или IDE: интерфейс,
+используемый разработчиками для ввода текста кода и вызова JDK.
+
+При разработке для Android вы будете использовать IDE Android Studio. Она не только послужит интерфейсом для кода на Java (или Kotlin),
+но и станет мостом для доступа к специфичным для Android вызовам из SDK.
+
+Для целей нашего краткого руководства по Java может быть и проще написать свой код непосредственно в приложении-компиляторе Java.
+Они могут быть скачаны для Android и iOS, можно даже найти веб-приложения, которые работают в вашем браузере.
+Эти инструменты предоставляют все необходимое в одном месте и позволяют сразу начать тестирование кода. Например, compilejava.net."/>
+            <column name="tittle" value="Как начать писать на Java?"/>
+            <column name="view_count" value="200"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="1"/>
+            <column name="post_id" value="2"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="2"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2018-12-13"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="2"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2018-12-13"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2018-12-14"/>
+            <column name="text" value="Если вы новичок в разработке на Java, то ваши опасения вполне понятны. Так насколько же легко изучить Java?
+
+Этот вопрос имеет несколько субъективную природу, но лично я бы отнес Java к языкам, не самым простым для изучения. Хотя он проще, чем C++, и часто описывается как более удобный для пользователя, но он, безусловно, не столь прост, как такие его конкуренты, как Python или BASIC, которые больше подходят для изучения начинающим программистам.
+
+C# также немного проще по сравнению с Java, хотя они очень похожи.
+
+Конечно, задавшись конкретной целью – стать разработчиком приложений для Android, – проще всего сразу начать с языка, который уже поддерживается этой платформой.
+
+У языка Java есть свои особенности, но его, безусловно, можно изучить, и как только вы его освоите, вам откроется множество возможностей. А поскольку Java имеет много общего с C и C#, вы сможете перейти на эти языки без особых усилий."/>
+            <column name="tittle" value="Насколько легко научиться программированию на Java?"/>
+            <column name="view_count" value="478"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="1"/>
+            <column name="post_id" value="3"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="3"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2018-12-14"/>
+            <column name="value" value="-1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="3"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2018-12-15"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2018-12-15"/>
+            <column name="text" value="Прежде чем мы погрузимся в самую суть этого руководства по Java для начинающих, стоит уделить некоторое время изучению синтаксиса Java.
+
+Синтаксис Java относится к способу написания конкретных алгоритмов. Java очень принципиален в этом вопросе, и, если вы не пишете код определенным образом, то ваша программа не будет работать!
+
+На самом деле я написал целую статью о синтаксисе Java для разработки Android, кратко перечислю особенности синтаксиса:
+
+Большинство строк должно заканчиваться точкой с запятой «;».
+Исключение составляет строка, открывающая новый блок кода. Она должна начинаться открытой фигурной скобкой «{». В качестве альтернативы эту открытую скобку можно поместить на новую строку под оператором. Блоки кода – это фрагменты кода, которые выполняют определенные, отдельные задачи.
+Код внутри блока кода должен иметь отступ, чтобы отделить его от остальных.
+Открытые блоки кода должны быть закрыты закрывающей фигурной скобкой «}».
+Комментарии – это строки, которым предшествуют символы «//».
+Если вы нажимаете кнопку «запустить» или «скомпилировать» и получаете ошибку, то есть большая вероятность, что вы где-то пропустили точку с запятой!
+
+Вы никогда не перестанете делать это, и это никогда не перестанет вас раздражать. Расслабьтесь!
+
+С этими знаниями мы сможем глубже погрузиться в руководство по Java!"/>
+            <column name="tittle" value="Каков синтаксис Java?"/>
+            <column name="view_count" value="369"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="1"/>
+            <column name="post_id" value="4"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="4"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2020-01-14"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2018-12-16"/>
+            <column name="text" value="Зайдите на  compilejava.net, и вас встретит редактор с кучей готовых примеров.
+
+(Если же вы предпочитаете использовать другую IDE или стороннее приложение, это тоже прекрасно! Скорее всего, ваш новый проект будет состоять из аналогичного кода).
+
+Удалите все, кроме следующего:
+
+    public class HelloWorld
+    {
+      public static void main(String[] args)
+      {
+      }
+    }
+Это то, что мы, программисты, мы называем «шаблоном» (этот код скопирован из учебника Java от Фила Данфи). Шаблонный код – так можно назвать любой код, который встречается внутри практически любой программы.
+
+Первая строка здесь определяет «класс», который по сути является модулем кода. Затем нам нужен метод внутри этого класса, который представляет собой небольшой блок кода, выполняющий задачу. В каждой программе Java должен быть метод main, так как он сообщает Java, где начинается программа.
+
+Об остальном поговорим чуть ниже, не беспокойтесь. Все, что нам нужно знать для этого урока Java прямо сейчас, – это то, что код, который мы действительно хотим запустить, должен быть помещен в фигурные скобки под словом «main».
+
+Поместите сюда следующий оператор:
+
+System.out.print('Hello world'!);
+
+            Этот оператор напишет слова: «Hello world!» на вашем экране. Нажмите «Compile Execute» и вы увидите его в действии.
+
+            Поздравляю! Вы только что написали свое первое Java-приложение!
+
+            "/>
+            <column name="tittle" value="Основы Java: ваша первая программа"/>
+            <column name="view_count" value="412"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="1"/>
+            <column name="post_id" value="5"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="5"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2018-12-16"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="5"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2018-12-17"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2018-12-18"/>
+            <column name="text" value="Теперь пришло время рассказать о некоторых более важных вещах, лежащих в основе Java. Мало что может быть более фундаментальным в программировании, чем обучение использованию переменных!
+
+Переменная по сути является «контейнером» для некоторых данных. Это означает, что вы выберете слово, которое будет представлять какое-то значение. Нам также необходимо определить переменные, основанные на типе данных, на которые они будут ссылаться.
+
+Вот три основных типа переменных Java:
+
+Целые числа (integers) – как целые числа.
+Плавающие точки (floats) – или «переменные с плавающей точкой». Они содержат все числа, в том числе те, которые представляют десятичные дроби. «Плавающая точка» относится к десятичному разряду.
+Строки (strings)– строки содержат буквенно-цифровые символы и символы. Обычно строка используется для хранения чьего-то имени или, возможно, предложения."/>
+            <column name="tittle" value="Переменные Java?"/>
+            <column name="view_count" value="47"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="1"/>
+            <column name="post_id" value="6"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="6"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2018-12-19"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="6"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2018-12-19"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2019-04-14"/>
+            <column name="text" value="Hard skills — это навыки, которые получают в школе и вузе, на курсах, на рабочем месте и так далее. Часто их проверяют перед собеседованием с помощью тестовых заданий.
+
+У каждой специальности свои «жёсткие» навыки. Например, архитектор должен знать, как использовать программное обеспечение для построения макетов, бухгалтер — работать с 1С, а переводчик — говорить на иностранном языке и знать особенности литературного или технического перевода.
+
+Как правило, «жёсткие» навыки — это основные требования к работнику. По ним наниматель определяет, как вы справитесь с должностными обязанностями. Часто рекрутеры ищут кандидатов на должность по hard skills, используя названия навыков как ключевые слова в поиске. Откройте вакансии и посмотрите, какие требования к кандидатам повторяются в них чаще всего, и какие стоят на первом месте — скорее всего, именно они важны для нанимателя. На них стоит обратить внимание и включить в разделы «навыки» и «опыт».
+
+"/>
+            <column name="tittle" value="Что такое hard skills"/>
+            <column name="view_count" value="173"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="7"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2019-04-16"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="7"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2019-04-17"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2019-05-15"/>
+            <column name="text" value="Soft skills определяют уровень эмоционального интеллекта, ответственность, умение общаться с людьми и работать в команде, — в общем, характеризуют работника как личность.
+
+«Гибкие» навыки сложнее оценить через резюме. Обычно рекрутер или работодатель смотрит на soft skill потенциального работника во время личного разговора. Здесь играет роль то, вовремя ли вы пришли на собеседование, сильно ли нервничаете, как общаетесь и отвечаете на вопросы.
+
+Кстати, исследование LinkedIn показало, что 57% нанимателей ставят «гибкие» навыки выше «жёстких»."/>
+            <column name="tittle" value="Что такое soft skills"/>
+            <column name="view_count" value="88"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="8"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2019-05-16"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="8"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2019-05-17"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2019-05-16"/>
+            <column name="text" value="«Жёсткие» навыки — это профессионализм. Их улучшают с помощью работы, дополнительных курсов, книг и подкастов по теме. Ещё можно обратиться к более компетентным сотрудникам: подскажут что и как стоит подтянуть.
+
+«Гибким» навыкам сложнее обучиться, чем «жёстким». Чтобы развить их, нужно постоянно общаться, учиться работать в команде и не нервничать перед публичными выступлениями. А также постоянно анализировать, что вы говорите и пишете, насколько вы грамотны и хорошо ли различаете формальный и неформальный тип общения, деловые переписки и флуд в рабочем чате.
+
+Важный навык — креативность. Его помогут развить участие в брейнштормах, книги и фильмы которые будут вдохновлять на новые идеи. Ещё важно общение с творческими людьми — они научат мыслить нестандартно."/>
+            <column name="tittle" value="Как развить hard skills и soft skills?"/>
+            <column name="view_count" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="9"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2019-05-20"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="9"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2019-05-21"/>
+            <column name="value" value="-1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2020-11-12"/>
+            <column name="text" value="Разберёмся, чем отличаются команды git pull и git fetch.
+
+При использовании pull, git пытается сделать всё за вас. Он сливает любые внесённые коммиты в ветку, в которой вы сейчас работаете. Команда pull автоматически сливает коммиты, не давая вам сначала просмотреть их. Если вы не пристально следите за ветками, выполнение этой команды может привести к частым конфликтам.
+
+При использовании fetch, git собирает все коммиты из целевой ветки, которых нет в текущей ветке, и сохраняет их в локальном репозитории. Однако он не сливает их в текущую ветку. Это особенно полезно, если вам нужно постоянно обновлять свой репозиторий, но вы работаете над функциональностью, неправильная реализация которой может негативно сказаться на проекте в целом. Чтобы слить коммиты в основную ветвь, нужно использовать merge.
+
+Грубо говоря, по дефолту git pull — это шоткод для последовательности двух команд: git fetch (получение изменений с сервера) и git merge (сливание в локальную копию)."/>
+            <column name="tittle" value="Разница между git pull и git fetch"/>
+            <column name="view_count" value="158"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="2"/>
+            <column name="post_id" value="10"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="10"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2020-11-20"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="10"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2020-11-20"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2020-11-14"/>
+            <column name="text" value="GitPass — минималистичный менеджер паролей на основе Git, с открытым исходным кодом, простым консольным интерфейсом и сохранением истории. Написан на Python с использованием Fernet. Для работы вам потребуется Python, аккаунт на GitHub и пароли, которые надо сохранить."/>
+            <column name="tittle" value="Что такое GitPass"/>
+            <column name="view_count" value="48"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="2"/>
+            <column name="post_id" value="11"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="11"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2020-11-20"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="11"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2020-11-20"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="1"/>
+            <column name="moderation_status" value="ACCEPTED"/>
+            <column name="user_id" value="3"/>
+            <column name="time" value="2020-12-14"/>
+            <column name="text" value="Коммиты — базовое понятие во всех системах контроля версий, поэтому совершатся
+он должен легко и по возможности быстро. В самом своем простом виде достаточно
+после индексации набрать:
+
+git commit
+
+Если индекс не пустой, то на его основе будет совершен коммит, после чего
+пользователя попросят прокомментировать вносимые изменения вызовом команды
+edit(например, в Ubuntu обычно вызывается простенький текстовый редактор nano, у
+меня же — emacs). Сохраняемся, и вуала! Коммит готов.
+
+Есть несколько ключей, упрощающих работу с git commit:
+
+git commit -a — совершит коммит, автоматически индексируя изменения в файлах
+проекта. Новые файлы при этом индексироваться не будут! Удаление же файлов
+будет учтено.
+
+
+git commit -m «commit comment» — комментируем коммит прямо из командной строки
+вместо текстового редактора.
+
+git commit FILENAME — внесет в индекс и создаст коммит на основе изменений
+единственного файла."/>
+            <column name="tittle" value="Git commit - как использовать?"/>
+            <column name="view_count" value="50"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="2"/>
+            <column name="post_id" value="12"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="12"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2020-12-20"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="post_votes">
+            <column name="post_id" value="12"/>
+            <column name="user_id" value="2"/>
+            <column name="time" value="2020-12-14"/>
+            <column name="value" value="1"/>
+        </insert>
+        <insert tableName="posts">
+            <column name="is_active" value="0"/>
+            <column name="moderation_status" value="NEW"/>
+            <column name="user_id" value="1"/>
+            <column name="time" value="2021-05-18"/>
+            <column name="text" value="Упрощенно различие между уровнями разработчиков можно описать так: Junior — совсем новичок, может мало и часто с чужой помощью; Middle может многое и сам; Senior помогает всем, руководит или является гуру в одной из сфер. Кроме способности решать задачи, в разработчике для нас важны знания и вовлеченность в жизнь команды и продукта.
+
+Конкретное наполнение уровней зависит от стека технологий, который используется в компании. Деление примерно такое:
+
+Junior разработчик — вчерашний студент или даже школьник, имеющий случайный набор начальных навыков, который мы сочли достаточным, чтобы дать человеку шанс. Готов выслушивать критику и много учиться.
+
+Middle разработчик — вчерашний Junior, успешно освоивший весь стек технологий, используемый командой. Его уже не пугает командная строка и Git. Он уверенно, самостоятельно и в срок решает небольшие задачи/баги. Высказывает полезные замечания при просмотре чужого кода.
+
+Senior разработчик — ментор, евангелист. Ему можно поручить новый продукт или направление. Он уже руководит подразделением (teamlead) или является очень крутым разработчиком (techlead). Партнер компании. Он понимает, для кого делается тот или иной продукт. Кто, что и как должен делать.
+
+Внутри этих понятий тоже есть разделение. Кроме Junior, есть Junior+ и Junior++. Аналогично с Middle, а с Senior — нет. Senior он есть, и все. «Он крут! Сам все решает и делает. Имеет авторитет в команде и вне» — так закреплено у нас. Мы ориентируемся на эти уровни при поиске новых программистов и для работы с теми, кто уже в команде. Глядя на требования — а они зафиксированы и открыты, — сотрудники понимают, в какую сторону «копать», чтобы вырасти. Это что-то вроде OKR (Objectives and Key Results).
+"/>
+            <column name="tittle" value="Разница между junior, middle, senior"/>
+            <column name="view_count" value="1"/>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="tag_id" value="3"/>
+            <column name="post_id" value="13"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

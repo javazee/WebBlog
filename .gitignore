@@ -1,0 +1,8 @@
+# Default ignored files
+/shelf/
+/.idea/workspace.xml
+/out/
+/.idea
+/.jpb
+/target/
+/src/main/resources/db/changelog/20*

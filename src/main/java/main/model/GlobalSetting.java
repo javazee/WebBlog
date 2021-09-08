@@ -51,4 +51,13 @@ public class GlobalSetting {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "GlobalSetting{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }
