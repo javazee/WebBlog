@@ -35,7 +35,7 @@ public class Post {
     private Date publicationTime;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
-    private String tittle;
+    private String title;
 
     @Column(columnDefinition = "TEXT NOT NULL")
     private String text;
@@ -48,7 +48,7 @@ public class Post {
         this.moderationStatus = moderationStatus;
         this.user = user;
         this.publicationTime = publicationTime;
-        this.tittle = tittle;
+        this.title = tittle;
         this.text = text;
         this.countOfView = countOfView;
     }
@@ -112,11 +112,11 @@ public class Post {
     }
 
     public String getTittle() {
-        return tittle;
+        return title;
     }
 
-    public void setTittle(String tittle) {
-        this.tittle = tittle;
+    public void setTittle(String title) {
+        this.title = title;
     }
 
     public String getText() {

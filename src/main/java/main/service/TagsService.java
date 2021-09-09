@@ -16,16 +16,21 @@ import static java.util.Collections.*;
 @Service
 public class TagsService {
 
-    @Autowired
-    TagRepository tagRepository;
+    private final TagRepository tagRepository;
+
+    private final TagToPostRepository tagToPostRepository;
+
+    private final PostRepository postRepository;
 
     @Autowired
-    TagToPostRepository tagToPostRepository;
+    public TagsService(TagRepository tagRepository,
+                       TagToPostRepository tagToPostRepository,
+                       PostRepository postRepository) {
+        this.tagRepository = tagRepository;
+        this.tagToPostRepository = tagToPostRepository;
+        this.postRepository = postRepository;
+    }
 
-    @Autowired
-    PostRepository postRepository;
-
-    TagsResponse tagsResponse;
 
     public TagsResponse getTags(){
         List<TagToPost> tagToPosts = tagToPostRepository.findAll();
@@ -46,7 +51,7 @@ public class TagsService {
         float k = 1 / weight;
 
         //создание объекта response и заполнение его данными
-        tagsResponse = new TagsResponse();
+        TagsResponse tagsResponse = new TagsResponse();
         for (Map.Entry<Integer, Integer> entry: tagsCount.entrySet()){
             if (tagRepository.findById(entry.getKey()).isPresent()) {
                 TagResponse tagResponse = new TagResponse();

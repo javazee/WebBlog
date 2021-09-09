@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthCheckService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    AuthCheckResponse authCheckResponse;
+    @Autowired
+    public AuthCheckService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public AuthCheckResponse authCheck(){
         return new AuthCheckResponse();

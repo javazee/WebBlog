@@ -2,81 +2,78 @@ package main.service;
 
 import main.api.response.postsResponse.ListOfPostResponse;
 import main.api.response.postsResponse.PostResponse;
-import main.model.Post;
-import main.model.User;
-import main.model.repository.PostCommentRepository;
 import main.model.repository.PostRepository;
-import main.model.repository.PostVoteRepository;
-import main.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostService {
 
-    @Autowired
-    PostRepository postRepository;
+
+    private final PostRepository postRepository;
+
+    private int page;
 
     @Autowired
-    PostVoteRepository postVoteRepository;
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
-    @Autowired
-    PostCommentRepository postCommentRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    ListOfPostResponse listOfPost;
-
-    public ListOfPostResponse listPosts(int offset, int limit, String mode){
-        listOfPost = new ListOfPostResponse();
+    public ListOfPostResponse listPosts(int offset, int limit, String mode) {
+        ListOfPostResponse listOfPost = new ListOfPostResponse();
         listOfPost.setCount(postRepository.countWithAcceptedStatusAndActiveState());
-        List<Post> posts;
+        List<Object[]> posts;
         switch (mode) {
             case "early":
-                posts = postRepository.getPostsOrderByTime(PageRequest.of(offset, limit, Sort.by("publicationTime")));
+                if (offset == 0) page = 0;
+                posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit, Sort.by("time")));
+                page++;
                 break;
             case "popular":
-                posts = postRepository.getPostsOrderByCountOfComment(PageRequest.of(offset, limit));
+                if (offset == 0) page = 0;
+                posts = postRepository.getPostsOrderByCountOfComment(PageRequest.of(page, limit));
+                page++;
                 break;
             case "best":
-                posts = postRepository.getPostsOrderByCountOfLike(PageRequest.of(offset, limit));
+                if (offset == 0) page = 0;
+                posts = postRepository.getPostsOrderByCountOfLike(PageRequest.of(page, limit));
+                page++;
                 break;
             default:
-                posts = postRepository.getPostsOrderByTime(PageRequest.of(offset, limit, Sort.by("publicationTime").descending()));
+                if (offset == 0) page = 0;
+                posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit, Sort.by("time").descending()));
+                page++;
         }
-        for (Post post: posts){
+        for (Object[] post : posts) {
             PostResponse postResponse = new PostResponse();
-            postResponse.setId(post.getId());
-            postResponse.setTitle(post.getTittle());
-            postResponse.setTimestamp(post.getPublicationTime().getTime() / 1000);
-            postResponse.setAnnounce(createAnnounce(post.getText()));
-            postResponse.setViewCount(post.getCountOfView());
-            postResponse.setLikeCount(postVoteRepository.countLikeForPost(post.getId()));
-            postResponse.setDislikeCount(postVoteRepository.countDislikeForPost(post.getId()));
-            postResponse.setCommentCount(postCommentRepository.countCommentForPost(post.getId()));
-            Optional<User> author = userRepository.findById(post.getUser().getId());
-            if (author.isPresent()) {
-                postResponse.getUser().setId(author.get().getId());
-                postResponse.getUser().setName(author.get().getName());
-            }
+            postResponse.setId((int) post[0]);
+            postResponse.setTimestamp(((Date) post[1]).getTime() / 1000);
+            postResponse.setTitle(post[2].toString());
+            postResponse.setAnnounce(createAnnounce((String) post[3]));
+            postResponse.setViewCount((int) post[4]);
+            postResponse.setCommentCount(Integer.parseInt(post[5].toString()));
+            postResponse.setLikeCount(Integer.parseInt(post[6].toString()));
+            postResponse.setDislikeCount(Integer.parseInt(post[7].toString()));
+            postResponse.getUser().setId(Integer.parseInt(post[8].toString()));
+            postResponse.getUser().setName((String) post[9]);
             listOfPost.getPosts().add(postResponse);
         }
         return listOfPost;
     }
 
     String createAnnounce(String text){
+        String noHTMLext = text.replaceAll("\\<.*?\\>", "");
         int count = 0;
         while (true){
-            int index = text.indexOf(" ", count + 1);
+            int index = noHTMLext.indexOf(" ", count + 1);
             if (index < 150) {
                 count = index;
-            } else return text.substring(0, count) + "...";
+            } else return noHTMLext.substring(0, count) + "...";
         }
     }
 }

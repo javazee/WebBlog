@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ApiPostController {
 
-    private PostService postService;
+    private final PostService postService;
 
     public ApiPostController(PostService postService) {
         this.postService = postService;
