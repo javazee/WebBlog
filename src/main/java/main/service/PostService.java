@@ -2,13 +2,12 @@ package main.service;
 
 import main.api.response.postsResponse.ListOfPostResponse;
 import main.api.response.postsResponse.PostResponse;
+import main.model.Post;
 import main.model.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -31,7 +30,7 @@ public class PostService {
         switch (mode) {
             case "early":
                 if (offset == 0) page = 0;
-                posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit, Sort.by("time")));
+                posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit));
                 page++;
                 break;
             case "popular":
@@ -46,21 +45,22 @@ public class PostService {
                 break;
             default:
                 if (offset == 0) page = 0;
-                posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit, Sort.by("time").descending()));
+                posts = postRepository.getPostsOrderByTimeDesc(PageRequest.of(page, limit));
                 page++;
         }
-        for (Object[] post : posts) {
+        for (Object[] object : posts) {
             PostResponse postResponse = new PostResponse();
-            postResponse.setId((int) post[0]);
-            postResponse.setTimestamp(((Date) post[1]).getTime() / 1000);
-            postResponse.setTitle(post[2].toString());
-            postResponse.setAnnounce(createAnnounce((String) post[3]));
-            postResponse.setViewCount((int) post[4]);
-            postResponse.setCommentCount(Integer.parseInt(post[5].toString()));
-            postResponse.setLikeCount(Integer.parseInt(post[6].toString()));
-            postResponse.setDislikeCount(Integer.parseInt(post[7].toString()));
-            postResponse.getUser().setId(Integer.parseInt(post[8].toString()));
-            postResponse.getUser().setName((String) post[9]);
+            Post post = (Post) object[0];
+            postResponse.setId(post.getId());
+            postResponse.setTimestamp(post.getPublicationTime().getTime() / 1000);
+            postResponse.setTitle(post.getTittle());
+            postResponse.setAnnounce(createAnnounce(post.getText()));
+            postResponse.setViewCount(post.getCountOfView());
+            postResponse.setCommentCount(Integer.parseInt(object[1].toString()));
+            postResponse.setLikeCount(Integer.parseInt(object[2].toString()));
+            postResponse.setDislikeCount(Integer.parseInt(object[3].toString()));
+            postResponse.getUser().setId(post.getUser().getId());
+            postResponse.getUser().setName(post.getUser().getName());
             listOfPost.getPosts().add(postResponse);
         }
         return listOfPost;

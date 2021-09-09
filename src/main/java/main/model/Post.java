@@ -22,8 +22,8 @@ public class Post {
 
     @ManyToMany
     @JoinTable(name = "moderator_posts",
-            joinColumns = @JoinColumn (name = "post_id"),
-            inverseJoinColumns = @JoinColumn (name = "moderator_id"))
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "moderator_id"))
     private List<User> moderators;
 
     @ManyToOne
@@ -53,7 +53,8 @@ public class Post {
         this.countOfView = countOfView;
     }
 
-    public Post() {}
+    public Post() {
+    }
 
     public int getId() {
         return id;
@@ -85,7 +86,7 @@ public class Post {
 
     public void setModerators(List<User> moderators) {
         this.moderators = moderators;
-        for (User moderator: moderators){
+        for (User moderator : moderators) {
             moderator.getModeratedPosts().add(this);
         }
     }
@@ -135,4 +136,18 @@ public class Post {
         this.countOfView = countOfView;
     }
 
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", isActive=" + isActive +
+                ", moderationStatus=" + moderationStatus +
+                ", moderators=" + moderators +
+                ", user=" + user +
+                ", publicationTime=" + publicationTime +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", countOfView=" + countOfView +
+                '}';
+    }
 }

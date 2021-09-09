@@ -132,7 +132,6 @@ public class User {
                 ", recoveryCode='" + recoveryCode + '\'' +
                 ", email='" + email + '\'' +
                 ", photoLink='" + photoLink + '\'' +
-                ", moderatedPosts=" + moderatedPosts +
                 '}';
     }
 }

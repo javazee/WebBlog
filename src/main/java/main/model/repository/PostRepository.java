@@ -14,33 +14,31 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "Select count(p) from Post p where p.moderationStatus = 'ACCEPTED' and p.isActive = '1'")
     long countWithAcceptedStatusAndActiveState();
 
-    @Query(value = "select id, time, title, text, view_count, " +
-            "(select count(*) from post_comments  where posts.id = post_comments.post_id) as comment_count, " +
-            "(select count(*) from post_votes where posts.id = post_votes.post_id and value = '1') as like_count, " +
-            "(select count(*) from post_votes where posts.id = post_votes.post_id and value = '-1') as dislike_count, " +
-            "(select id from users where posts.user_id = users.id) as user_id, " +
-            "(select name from users where posts.user_id = users.id) as user_name " +
-            "from posts where is_active = 1 and moderation_status = 'ACCEPTED'",
-            nativeQuery = true)
-    List<Object[]> getPostsOrderByTime(Pageable page);
+    @Query(value = "select p, " +
+            "(select count(pc) from PostComment pc where p.id = pc.post.id), " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '1'), " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '-1') " +
+            "from Post p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' order by p.publicationTime desc")
+    List<Object[]> getPostsOrderByTimeDesc(Pageable pageable);
 
-    @Query(value = "select id, time, title, text, view_count, " +
-            "(select count(*) from post_comments  where posts.id = post_comments.post_id) as comment_count, " +
-            "(select count(*) from post_votes where posts.id = post_votes.post_id and value = '1') as like_count, " +
-            "(select count(*) from post_votes where posts.id = post_votes.post_id and value = '-1') as dislike_count, " +
-            "(select id from users where posts.user_id = users.id) as user_id, " +
-            "(select name from users where posts.user_id = users.id) as user_name " +
-            "from posts where is_active = 1 and moderation_status = 'ACCEPTED' order by comment_count desc, time desc",
-            nativeQuery = true)
+    @Query(value = "select p, " +
+            "(select count(pc) from PostComment pc where p.id = pc.post.id), " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '1'), " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '-1') " +
+            "from Post p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' order by p.publicationTime")
+    List<Object[]> getPostsOrderByTime(Pageable pageable);
+
+    @Query(value = "select p, " +
+            "(select count(pc) from PostComment pc where p.id = pc.post.id) as cc, " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '1'), " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '-1') " +
+            "from Post p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' order by cc desc, p.publicationTime desc")
     List<Object[]> getPostsOrderByCountOfComment(Pageable page);
 
-    @Query(value = "select id, time, title, text, view_count, " +
-            "(select count(*) from post_comments  where posts.id = post_comments.post_id) as comment_count, " +
-            "(select count(*) from post_votes where posts.id = post_votes.post_id and value = '1') as like_count, " +
-            "(select count(*) from post_votes where posts.id = post_votes.post_id and value = '-1') as dislike_count, " +
-            "(select id from users where posts.user_id = users.id) as user_id, " +
-            "(select name from users where posts.user_id = users.id) as user_name " +
-            "from posts where is_active = 1 and moderation_status = 'ACCEPTED' order by like_count desc, time desc",
-            nativeQuery = true)
+    @Query(value = "select p, " +
+            "(select count(pc) from PostComment pc where p.id = pc.post.id), " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '1') as lk, " +
+            "(select count(pv) from PostVote pv where p.id = pv.post.id and pv.value = '-1') as dk " +
+            "from Post p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' order by lk desc, dk, p.publicationTime desc")
     List<Object[]> getPostsOrderByCountOfLike(Pageable page);
 }
