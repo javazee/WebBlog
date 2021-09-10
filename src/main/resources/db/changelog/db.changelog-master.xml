@@ -723,4 +723,5 @@ Senior разработчик — ментор, евангелист. Ему м�
             <column name="post_id" value="13"/>
         </insert>
     </changeSet>
+    <include file="2021/09/09-10-changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
