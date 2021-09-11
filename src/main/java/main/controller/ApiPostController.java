@@ -23,4 +23,12 @@ public class ApiPostController {
                                      @Param("mode") String mode){
         return postService.listPosts(offset, limit, mode);
     }
+
+    @GetMapping("/post/search")
+    private ListOfPostResponse searchPosts(@Param("offset") int offset,
+                                     @Param("limit") int limit,
+                                     @Param("query") String query) {
+        return postService.searchPosts(offset, limit, query);
+    }
+
 }

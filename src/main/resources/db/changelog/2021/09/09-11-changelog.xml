@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="22" author="eduard">
+        <insert tableName="posts">
+            <column name="title">John Lennon's quotes</column>
+            <column name="user_id">4</column>
+            <column name="text">When I was 5 years old, my mother always told me that happiness was the key to life.
+                When I went to school, they asked me what I wanted to be when I grew up. I wrote down ‘happy’.
+                They told me I didn’t understand the assignment, and I told them they didn’t understand life.
+
+                We need to learn to love ourselves first, in all our glory and our imperfections.
+                If we cannot love ourselves, we cannot fully open to our ability to love others or our potential to create.
+                Evolution and all hopes for a better world rest in the fearlessness and open-hearted vision of people who embrace life</column>
+            <column name="time">2021-12-01</column>
+            <column name="view_count">0</column>
+            <column name="moderation_status">ACCEPTED</column>
+            <column name="is_active">1</column>
+        </insert>
+        <insert tableName="tag2post">
+            <column name="post_id">29</column>
+            <column name="tag_id">4</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

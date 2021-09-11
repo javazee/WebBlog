@@ -724,4 +724,5 @@ Senior разработчик — ментор, евангелист. Ему м�
         </insert>
     </changeSet>
     <include file="2021/09/09-10-changelog.xml" relativeToChangelogFile="true"/>
+    <include file="2021/09/09-11-changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
