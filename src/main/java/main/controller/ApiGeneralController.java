@@ -7,6 +7,7 @@ import main.service.SettingsService;
 import main.service.TagsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,7 +35,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/tag")
-    private TagsResponse tags(){
-        return tagsService.getTags();
+    private TagsResponse tags(@RequestParam(required = false) String query){
+        return tagsService.getTags(query);
     }
 }
