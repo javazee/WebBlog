@@ -31,7 +31,7 @@ public class Post {
     private User user;
 
     @Column(name = "time", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date publicationTime;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
@@ -42,6 +42,14 @@ public class Post {
 
     @Column(name = "view_count", columnDefinition = "INT NOT NULL")
     private int countOfView;
+
+    @OneToMany
+    @JoinColumn(name = "post_id")
+    private List<PostVote> likes;
+
+    @OneToMany
+    @JoinColumn(name = "post_id")
+    private List<PostComment> comments;
 
     public Post(boolean isActive, ModerationStatus moderationStatus, User user, Date publicationTime, String tittle, String text, int countOfView) {
         this.isActive = isActive;
@@ -136,6 +144,30 @@ public class Post {
         this.countOfView = countOfView;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<PostVote> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostVote> likes) {
+        this.likes = likes;
+    }
+
+    public List<PostComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<PostComment> comments) {
+        this.comments = comments;
+    }
+
     @Override
     public String toString() {
         return "Post{" +
@@ -145,9 +177,11 @@ public class Post {
                 ", moderators=" + moderators +
                 ", user=" + user +
                 ", publicationTime=" + publicationTime +
-                ", title='" + title + '\'' +
-                ", text='" + text + '\'' +
+                ", title='" + title +
+                ", text='" + text +
                 ", countOfView=" + countOfView +
+                ", countOfComment=" + comments.size() +
+                ", countOfLike=" + likes.size() +
                 '}';
     }
 }

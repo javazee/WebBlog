@@ -15,10 +15,10 @@ public class User {
     private int id;
 
     @Column(name = "is_moderator", columnDefinition = "TINYINT(1) NOT NULL")
-    private Boolean isModerator;
+    private boolean isModerator;
 
     @Column(name = "reg_time", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date registrationDate;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")

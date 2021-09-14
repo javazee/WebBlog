@@ -24,9 +24,9 @@ public class TagsService {
 
 
     public TagsResponse getTags(String query){
-        List<Object[]> tagToPosts = tagToPostRepository.findTags((query == null)? "": query, new Date());
+        List<Object[]> tagToPosts = tagToPostRepository.findTags((query == null)? "": query);
         //количество всех постов
-        long count = postRepository.countActiveAndAcceptedPost(new Date());
+        long count = postRepository.countActiveAndAcceptedPosts();
 
         //ненормализованный вес самого популярного тега
         float weight = 1;

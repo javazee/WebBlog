@@ -24,7 +24,7 @@ public class PostComment {
     private User user;
 
     @Column(name = "time", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date commentTime;
 
     @Column(nullable = false)

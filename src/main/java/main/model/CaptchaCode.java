@@ -13,7 +13,7 @@ public class CaptchaCode {
     private int id;
 
     @Column(name = "time", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date generationTime;
 
     @Column(columnDefinition = "TINYTEXT NOT NULL")
@@ -21,6 +21,38 @@ public class CaptchaCode {
 
     @Column(name = "secret_code", columnDefinition = "TINYTEXT NOT NULL")
     private String secretCode;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Date getGenerationTime() {
+        return generationTime;
+    }
+
+    public void setGenerationTime(Date generationTime) {
+        this.generationTime = generationTime;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getSecretCode() {
+        return secretCode;
+    }
+
+    public void setSecretCode(String secretCode) {
+        this.secretCode = secretCode;
+    }
 
 
 

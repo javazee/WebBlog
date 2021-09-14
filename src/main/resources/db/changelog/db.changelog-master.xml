@@ -9,7 +9,7 @@
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_captcha_codes"/>
             </column>
-            <column name="time" type="DATE">
+            <column name="time" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
             <column name="code" type="TINYTEXT">
@@ -58,7 +58,7 @@
             <column name="user_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="time" type="DATE">
+            <column name="time" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
             <column name="text" type="VARCHAR(255)">
@@ -77,7 +77,7 @@
             <column name="post_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="time" type="DATE">
+            <column name="time" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
             <column name="value" type="TINYINT">
@@ -99,7 +99,7 @@
             <column name="user_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="time" type="DATE">
+            <column name="time" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
             <column name="title" type="VARCHAR(255)">
@@ -144,7 +144,7 @@
             <column name="is_moderator" type="TINYINT(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="reg_time" type="DATE">
+            <column name="reg_time" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)">
@@ -304,11 +304,6 @@ JDK – это «компилятор», который интерпретиру
         <insert tableName="tag2post">
             <column name="tag_id" value="1"/>
             <column name="post_id" value="1"/>
-        </insert>
-        <insert tableName="captcha_codes">
-            <column name="time" value="2018-05-06"/>
-            <column name="secret_code" value="sad4v65"/>
-            <column name="code" value="space oddity"/>
         </insert>
     </changeSet>
     <changeSet id="21" author="eduard">
@@ -725,4 +720,5 @@ Senior разработчик — ментор, евангелист. Ему м�
     </changeSet>
     <include file="2021/09/09-10-changelog.xml" relativeToChangelogFile="true"/>
     <include file="2021/09/09-11-changelog.xml" relativeToChangelogFile="true"/>
+    <include file="2021/09/09-14-changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

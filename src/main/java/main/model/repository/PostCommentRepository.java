@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface PostCommentRepository extends JpaRepository<PostComment, Integer> {
 
-    @Query(value = "select pc, u from PostComment pc join User u on pc.user.id = u.id where pc.post.id = :id")
-    List<Object[]> findAllByPostId(@Param("id") int id);
+    @Query(value = "SELECT pc from PostComment pc where pc.post.id = :id")
+    List<PostComment> findAllByPostId(@Param("id") int id);
 
 }

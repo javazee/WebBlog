@@ -2,9 +2,10 @@ package main.controller;
 
 import main.api.response.postsResponse.PostResponseById;
 import main.api.response.postsResponse.PostsCountByDateResponse;
-import main.api.response.postsResponse.ListOfPostResponse;
 import main.service.PostService;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,31 +19,31 @@ public class ApiPostController {
     }
 
     @GetMapping("/post")
-    private ListOfPostResponse posts(@Param("offset") int offset,
+    private ResponseEntity<?> posts(@Param("offset") int offset,
                                      @Param("limit") int limit,
                                      @RequestParam(required = false) String mode){
-        return postService.listPosts(offset, limit, mode);
+        return ResponseEntity.status(HttpStatus.OK).body(postService.listPosts(offset, limit, mode));
     }
 
     @GetMapping("/post/search")
-    private ListOfPostResponse searchPosts(@Param("offset") int offset,
+    private ResponseEntity<?> searchPosts(@Param("offset") int offset,
                                      @Param("limit") int limit,
                                      @RequestParam(required = false) String query) {
-        return postService.searchPosts(offset, limit, query);
+        return ResponseEntity.status(HttpStatus.OK).body(postService.searchPosts(offset, limit, query));
     }
 
     @GetMapping("/post/byDate")
-    private ListOfPostResponse getPostsByDate(@Param("offset") int offset,
+    private ResponseEntity<?> getPostsByDate(@Param("offset") int offset,
                                               @Param("limit") int limit,
                                               @Param("date") String date){
-        return postService.getPostsByDate(offset, limit, date);
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getPostsByDate(offset, limit, date));
     }
 
     @GetMapping("/post/byTag")
-    private ListOfPostResponse getPostsByTag(@Param("offset") int offset,
+    private ResponseEntity<?> getPostsByTag(@Param("offset") int offset,
                                               @Param("limit") int limit,
                                               @RequestParam String tag){
-        return postService.getPostsByTag(offset, limit, tag);
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getPostsByTag(offset, limit, tag));
     }
 
     @GetMapping("/calendar")
@@ -51,8 +52,10 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/{id}")
-    private PostResponseById getPostById(@PathVariable Integer id){
-        return postService.getPostById(id);
+    private ResponseEntity<?> getPostById(@PathVariable Integer id) {
+        PostResponseById postResponseById = postService.getPostById(id);
+        if (postResponseById == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Документ не найден");
+        return new ResponseEntity<>(postResponseById, HttpStatus.OK);
     }
-
 }
