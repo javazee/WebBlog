@@ -1,5 +1,7 @@
 package main.model;
 
+import main.model.enums.Role;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,6 +50,10 @@ public class User {
     }
 
     public User() {}
+
+    public Role getRole(){
+        return isModerator ? Role.MODERATOR : Role.USER;
+    }
 
     public List<Post> getModeratedPosts() {
         return moderatedPosts;

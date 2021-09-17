@@ -3,16 +3,24 @@ package main.service;
 import main.api.response.postsResponse.*;
 import main.model.Post;
 import main.model.PostComment;
+import main.model.enums.ModerationStatus;
 import main.model.repository.PostCommentRepository;
 import main.model.repository.PostRepository;
 import main.model.repository.TagToPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class PostService {
@@ -34,7 +42,7 @@ public class PostService {
     }
 
     public ListOfPostResponse listPosts(int offset, int limit, String mode) {
-        List<Post> posts;
+        Page<Post> posts;
         int page = offset / limit;
         switch (mode) {
             case "early":
@@ -50,13 +58,13 @@ public class PostService {
                 posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit, Sort.by("publicationTime").descending()));
         }
         if (posts == null) return new ListOfPostResponse();
-        ListOfPostResponse listOfPost = createPostsList(posts);
-        listOfPost.setCount(postRepository.countActiveAndAcceptedPosts());
+        ListOfPostResponse listOfPost = createPostsList(posts.getContent());
+        listOfPost.setCount(posts.getTotalElements());
         return listOfPost;
     }
 
     public ListOfPostResponse searchPosts(int offset, int limit, String query){
-        List<Post> posts;
+        Page<Post> posts;
         int page = offset / limit;
         if (query == null || query.trim().isEmpty()){
             posts = postRepository.getPostsOrderByTime(PageRequest.of(page, limit, Sort.by("publicationTime").descending()));
@@ -64,20 +72,20 @@ public class PostService {
             posts = postRepository.searchPostsOrderByTimeDesc(query, PageRequest.of(page, limit, Sort.by("publicationTime").descending()));
         }
         if (posts == null) return new ListOfPostResponse();
-        ListOfPostResponse listOfPost = createPostsList(posts);
-        listOfPost.setCount(postRepository.countActiveAndAcceptedPostsWithQuery(query));
+        ListOfPostResponse listOfPost = createPostsList(posts.getContent());
+        listOfPost.setCount(posts.getTotalElements());
         return listOfPost;
     }
 
     public ListOfPostResponse getPostsByDate(int offset, int limit, String date){
-        List<Post> posts;
+        Page<Post> posts;
         int page = offset / limit;
         try {
             Date publicationDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
             posts = postRepository.getPostsByDate(publicationDate, PageRequest.of(page, limit, Sort.by("publicationTime").descending()));
             if (posts == null) return new ListOfPostResponse();
-            ListOfPostResponse listOfPost = createPostsList(posts);
-            listOfPost.setCount(postRepository.countActiveAndAcceptedPostsWithDate(publicationDate));
+            ListOfPostResponse listOfPost = createPostsList(posts.getContent());
+            listOfPost.setCount(posts.getTotalElements());
             return listOfPost;
         } catch (ParseException ex){
             ex.printStackTrace();
@@ -85,11 +93,47 @@ public class PostService {
         }
     }
 
+    public ListOfPostResponse findMyPosts(int offset, int limit, String status){
+        Page<Post> posts;
+        int page = offset / limit;
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        switch (status) {
+            case "pending":
+                posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
+                        true,
+                        ModerationStatus.NEW,
+                        email);
+                break;
+            case "declined":
+                posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
+                        true,
+                        ModerationStatus.DECLINED,
+                        email);
+                break;
+            case "published":
+                posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
+                        true,
+                        ModerationStatus.ACCEPTED, email);
+                break;
+            default:
+                posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
+                        false,
+                        ModerationStatus.NEW,
+                        email);
+        }
+        if (posts.isEmpty()) return new ListOfPostResponse();
+        ListOfPostResponse listOfPost = createPostsList(posts.getContent());
+        listOfPost.setCount(posts.getTotalElements());
+        return listOfPost;
+    }
+
     public ListOfPostResponse getPostsByTag(int offset, int limit, String tag){
         int page = offset / limit;
-        List<Post> posts = postRepository.findPostsByTag(tag, PageRequest.of(page, limit));
+        Page<Post> posts = postRepository.findPostsByTag(tag, PageRequest.of(page, limit));
         if (posts == null) return new ListOfPostResponse();
-        return createPostsList(posts);
+        ListOfPostResponse listOfPost = createPostsList(posts.getContent());
+        listOfPost.setCount(posts.getTotalElements());
+        return listOfPost;
     }
 
     public PostsCountByDateResponse getCountOfPostsByDate(Integer year){
@@ -119,9 +163,10 @@ public class PostService {
         postResponseById.setTitle(post.getTittle());
         postResponseById.setText(post.getText());
 
-        //добавить проверку на авторизацию
-        post.setCountOfView(post.getCountOfView() + 1);
-        postRepository.save(post);
+        if (!(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
+            post.setCountOfView(post.getCountOfView() + 1);
+            postRepository.save(post);
+        }
 
         postResponseById.setViewCount(post.getCountOfView());
         postResponseById.setTimestamp(post.getPublicationTime().getTime() / 1000);

@@ -1,4 +1,4 @@
-import main.model.ModerationStatus;
+import main.model.enums.ModerationStatus;
 import main.model.Post;
 import main.model.PostComment;
 import main.model.User;

@@ -11,4 +11,11 @@ public class DefaultController {
     public String index(Model model){
         return "index";
     }
+
+    @RequestMapping(value = {"/posts/**" , "/tag/**" , "/calendar/**", "/login/**",
+            "/profile/**", "/add/**", "/my/**", "/stat/**", "/moderation/**"})
+    public String home(){
+        return "index";
+    }
+
 }
