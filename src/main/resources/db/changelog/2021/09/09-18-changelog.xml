@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="25" author="eduard">
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="4"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="5"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="6"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="7"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="8"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="9"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="10"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="11"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="12"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="14"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="15"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="19"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="20"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="21"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="22"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="23"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="24"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="25"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="26"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="27"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="28"/>
+        </insert>
+        <insert tableName="moderator_posts" >
+            <column name="moderator_id" value="2"/>
+            <column name="post_id" value="29"/>
+        </insert>
+        <update tableName="posts">
+            <column name="is_active">1</column>
+            <where>id=16</where>
+        </update>
+        <update tableName="posts">
+            <column name="is_active">1</column>
+            <where>id=17</where>
+        </update>
+        <update tableName="posts">
+            <column name="is_active">1</column>
+            <where>id=18</where>
+        </update>
+        <update tableName="posts">
+            <column name="moderation_status">ACCEPTED</column>
+            <where>id=1</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

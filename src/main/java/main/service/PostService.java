@@ -130,10 +130,12 @@ public class PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         switch (status) {
             case "declined":
-                posts = postRepository.findMyModeratedPosts(PageRequest.of(page, limit, Sort.by("publicationTime")), ModerationStatus.DECLINED, email);
+                posts = postRepository.findMyModeratedPosts(PageRequest.of(page, limit, Sort.by("publicationTime").descending()),
+                        ModerationStatus.DECLINED, email);
                 break;
             case "accepted":
-                posts = postRepository.findMyModeratedPosts(PageRequest.of(page, limit, Sort.by("publicationTime")), ModerationStatus.ACCEPTED, email);
+                posts = postRepository.findMyModeratedPosts(PageRequest.of(page, limit, Sort.by("publicationTime").descending()),
+                        ModerationStatus.ACCEPTED, email);
                 break;
             default:
                 posts = postRepository.findNewPostsForModeration(PageRequest.of(page, limit, Sort.by("publicationTime")));
