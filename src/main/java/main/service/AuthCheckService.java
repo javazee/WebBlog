@@ -22,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -88,7 +89,9 @@ public class AuthCheckService {
             User user = new User();
             user.setName(registrationRequest.getName());
             user.setEmail(registrationRequest.getEmail());
-            user.setPassword(registrationRequest.getPassword());
+            user.setPassword(
+                    new BCryptPasswordEncoder().
+                            encode(registrationRequest.getPassword()));
             user.setRegistrationDate(new Date());
             userRepository.save(user);
             return new RegistrationResponse();

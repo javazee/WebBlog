@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PostService {
@@ -127,6 +124,28 @@ public class PostService {
         return listOfPost;
     }
 
+    public ListOfPostResponse getPostsForModeration(int offset, int limit, String status){
+        Page<Post> posts;
+        int page = offset / limit;
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        switch (status) {
+            case "declined":
+                posts = postRepository.findMyModeratedPosts(PageRequest.of(page, limit, Sort.by("publicationTime")), ModerationStatus.DECLINED, email);
+                break;
+            case "accepted":
+                posts = postRepository.findMyModeratedPosts(PageRequest.of(page, limit, Sort.by("publicationTime")), ModerationStatus.ACCEPTED, email);
+                break;
+            default:
+                posts = postRepository.findNewPostsForModeration(PageRequest.of(page, limit, Sort.by("publicationTime")));
+        }
+        if (posts.isEmpty()) return new ListOfPostResponse();
+        ListOfPostResponse listOfPost = createPostsList(posts.getContent());
+        listOfPost.setCount(posts.getTotalElements());
+        return listOfPost;
+    }
+
+
+
     public ListOfPostResponse getPostsByTag(int offset, int limit, String tag){
         int page = offset / limit;
         Page<Post> posts = postRepository.findPostsByTag(tag, PageRequest.of(page, limit));
@@ -154,8 +173,17 @@ public class PostService {
         return postsCountByDateResponse;
     }
 
+    public void moderatePost(int postId, String decision){
+        Optional<Post> post = postRepository.findPostById(postId);
+        if (post.isPresent()){
+            Post moderatedPost = post.get();
+            moderatedPost.setModerationStatus(decision.equals("decline") ? ModerationStatus.DECLINED : ModerationStatus.ACCEPTED);
+            postRepository.save(moderatedPost);
+        }
+    }
+
     public PostResponseById getPostById(Integer id){
-        Post post = postRepository.findPostById(id);
+        Post post = postRepository.getPostById(id);
          if (post == null) return null;
         PostResponseById postResponseById = new PostResponseById();
         postResponseById.setId(post.getId());

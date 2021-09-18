@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -65,9 +66,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "SELECT p FROM Post p " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime < CURRENT_DATE() " +
             "and p.id = :id")
-    Post findPostById(@Param("id") int id);
+    Post getPostById(@Param("id") int id);
 
-    @Query(value = "SELECT COUNT(p) FROM Post p WHERE p.moderationStatus = 'NEW'")
+    @Query(value = "SELECT COUNT(p) FROM Post p WHERE p.moderationStatus = 'NEW' and p.isActive = 1")
     int countPostsForModeration();
 
     @Query(value = "SELECT p FROM Post p " +
@@ -76,5 +77,14 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                           @Param("isActive") boolean isActive,
                           @Param("status") ModerationStatus status,
                           @Param("email") String email);
+
+    @Query(value = "SELECT p FROM Post p JOIN p.moderators ms ON ms.email = :email " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = :status")
+    Page<Post> findMyModeratedPosts(Pageable pageable, @Param("status") ModerationStatus status, @Param("email") String email);
+
+    @Query(value = "SELECT p FROM Post p WHERE p.isActive = 1 AND p.moderationStatus = 'NEW'")
+    Page<Post> findNewPostsForModeration(Pageable pageable);
+
+    Optional<Post> findPostById(int id);
 
 }

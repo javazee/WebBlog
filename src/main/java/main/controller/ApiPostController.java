@@ -1,5 +1,6 @@
 package main.controller;
 
+import main.api.request.DecisionRequest;
 import main.api.response.postsResponse.ListOfPostResponse;
 import main.api.response.postsResponse.PostResponseById;
 import main.api.response.postsResponse.PostsCountByDateResponse;
@@ -67,6 +68,21 @@ public class ApiPostController {
                                                              @RequestParam(defaultValue = "10", required = false) int limit,
                                                              @RequestParam(defaultValue = "inactive", required = false) String status) {
         return ResponseEntity.status(HttpStatus.OK).body(postService.findMyPosts(offset, limit, status));
+    }
+
+    @GetMapping(path = "/post/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    protected ResponseEntity<ListOfPostResponse> getPostsForModeration(@RequestParam(defaultValue = "0", required = false) int offset,
+                                                                       @RequestParam(defaultValue = "10", required = false) int limit,
+                                                                       @RequestParam(defaultValue = "new", required = false) String status) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getPostsForModeration(offset, limit, status));
+    }
+
+    @PostMapping("/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    protected HttpStatus moderatePost(@RequestBody DecisionRequest decision){
+        postService.moderatePost(decision.getId(), decision.getDecision());
+        return HttpStatus.OK;
     }
 
 
