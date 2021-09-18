@@ -17,28 +17,28 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
 
-    @Query("select count(p) from Post p where p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_DATE()")
+    @Query("select count(p) from Post p where p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_TIMESTAMP()")
     int countActiveAndAcceptedPosts();
 
     @Query(value = "SELECT p FROM Post p " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_TIMESTAMP() " +
             "GROUP BY p ")
     Page<Post> getPostsOrderByTime(Pageable pageable);
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_TIMESTAMP() " +
             "GROUP BY p ORDER BY COUNT(pc) DESC")
     Page<Post> getPostsOrderByCountOfComment(Pageable page);
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN PostVote pv ON pv.post.id = p.id " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_TIMESTAMP() " +
             "GROUP BY p ORDER BY COUNT(CASE pv.value WHEN 1 THEN 1 ELSE NULL END) DESC")
     Page<Post> getPostsOrderByCountOfLike(Pageable page);
 
     @Query(value = "SELECT p FROM Post p " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_TIMESTAMP() " +
             "and (p.text LIKE %:query% OR p.title LIKE %:query%) GROUP BY p ")
     Page<Post> searchPostsOrderByTimeDesc(@Param("query") String query, Pageable pageable);
 
@@ -47,24 +47,24 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     List<Integer> getYears(@Param("currentDate") Date date);
 
     @Query(value = "select date(p.publicationTime), count(p) from Post p where year(p.publicationTime) = :year and " +
-            "p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.publicationTime < CURRENT_DATE() " +
+            "p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.publicationTime < CURRENT_TIMESTAMP() " +
             "group by date(p.publicationTime) order by date(p.publicationTime)")
     List<Object[]> getPostsCountByDate(@Param("year") int year);
 
     @Query(value = "SELECT p FROM Post p " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime < CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime < CURRENT_TIMESTAMP() " +
             "and DATE(p.publicationTime) = :date GROUP BY p ")
     Page<Post> getPostsByDate(@Param("date") Date date, Pageable pageable);
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN TagToPost tp ON p.id = tp.post.id " +
             "LEFT JOIN Tag t on t.id = tp.tag.id " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime <= CURRENT_TIMESTAMP() " +
             "and t.text like %:tag% GROUP BY p")
     Page<Post> findPostsByTag(@Param("tag") String tag, Pageable pageable);
 
     @Query(value = "SELECT p FROM Post p " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime < CURRENT_DATE() " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime < CURRENT_TIMESTAMP() " +
             "and p.id = :id")
     Post getPostById(@Param("id") int id);
 

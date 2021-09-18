@@ -131,10 +131,10 @@ public class AuthCheckService {
         userLoginResponse.setEmail(user.getEmail());
         userLoginResponse.setName(user.getName());
         userLoginResponse.setPhoto(user.getPhotoLink());
-        userLoginResponse.setSettings(user.getModerator());
-        userLoginResponse.setModeration(user.getModerator());
+        userLoginResponse.setSettings(user.isModerator());
+        userLoginResponse.setModeration(user.isModerator());
         userLoginResponse.setModerationCount(
-                user.getModerator() ? postRepository.countPostsForModeration() : 0);
+                user.isModerator() ? postRepository.countPostsForModeration() : 0);
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setUserLoginResponse(userLoginResponse);
         loginResponse.setResult(true);

@@ -1,12 +1,10 @@
 package main.service;
 
+import main.api.response.AddPostResponse;
 import main.api.response.postsResponse.*;
-import main.model.Post;
-import main.model.PostComment;
+import main.model.*;
 import main.model.enums.ModerationStatus;
-import main.model.repository.PostCommentRepository;
-import main.model.repository.PostRepository;
-import main.model.repository.TagToPostRepository;
+import main.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,13 +27,21 @@ public class PostService {
 
     private final TagToPostRepository tagToPostRepository;
 
+    private final TagRepository tagRepository;
+
+    private final UserRepository userRepository;
+
     @Autowired
     public PostService(PostRepository postRepository,
                        PostCommentRepository postCommentRepository,
-                       TagToPostRepository tagToPostRepository) {
+                       TagToPostRepository tagToPostRepository,
+                       TagRepository tagRepository,
+                       UserRepository userRepository) {
         this.postRepository = postRepository;
         this.postCommentRepository = postCommentRepository;
         this.tagToPostRepository = tagToPostRepository;
+        this.tagRepository = tagRepository;
+        this.userRepository = userRepository;
     }
 
     public ListOfPostResponse listPosts(int offset, int limit, String mode) {
@@ -175,6 +181,9 @@ public class PostService {
         if (post.isPresent()){
             Post moderatedPost = post.get();
             moderatedPost.setModerationStatus(decision.equals("decline") ? ModerationStatus.DECLINED : ModerationStatus.ACCEPTED);
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Optional<User> user = userRepository.findByEmail(email);
+            moderatedPost.addModerator(user.get());
             postRepository.save(moderatedPost);
         }
     }
@@ -188,8 +197,12 @@ public class PostService {
         postResponseById.setTitle(post.getTittle());
         postResponseById.setText(post.getText());
         if (!(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
-            post.setCountOfView(post.getCountOfView() + 1);
-            postRepository.save(post);
+            String authName = SecurityContextHolder.getContext().getAuthentication().getName();
+            Optional<User> user = userRepository.findByEmail(authName);
+            if (user.get().getId() != post.getUser().getId() && !user.get().isModerator()) {
+                post.setCountOfView(post.getCountOfView() + 1);
+                postRepository.save(post);
+            }
         }
         postResponseById.setViewCount(post.getCountOfView());
         postResponseById.setTimestamp(post.getPublicationTime().getTime() / 1000);
@@ -212,6 +225,44 @@ public class PostService {
         List<String> tags = tagToPostRepository.findTagsByPostId(id);
         postResponseById.getTags().addAll(tags);
         return postResponseById;
+    }
+
+    public AddPostResponse addPost(long timestamp, int active, String title, List<String> tags, String text){
+        if (title.length() < 3 || text.length() < 50){
+            AddPostResponse response = new AddPostResponse();
+            if (title.length() < 3) response.getInvalidData().put("title", "Заголовок не установлен");
+            if (text.length() < 50) response.getInvalidData().put("text", "Текст публикации слишком короткий");
+            return response;
+        }
+        Post post = new Post();
+        Date currentTime = new Date();
+        post.setPublicationTime((timestamp < currentTime.getTime() / 1000) ? currentTime : new Date(timestamp * 1000));
+        post.setModerationStatus(ModerationStatus.NEW);
+        post.setTittle(title);
+        post.setText(text);
+        post.setActive(active == 1);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> user = userRepository.findByEmail(email);
+        post.setUser(user.get());
+        postRepository.save(post);
+        for (String tagText : tags){
+            Optional<Tag> tag = tagRepository.findByText(tagText);
+            TagToPost tagToPost = new TagToPost();
+            if (tag.isPresent()){
+                tagToPost.setTag(tag.get());
+                tagToPost.setPostId(post);
+            } else {
+                Tag newTag = new Tag();
+                newTag.setText(tagText);
+                tagToPost.setTag(newTag);
+                tagToPost.setPostId(post);
+                tagRepository.save(newTag);
+            }
+            tagToPostRepository.save(tagToPost);
+        }
+        AddPostResponse response = new AddPostResponse();
+        response.setResult(true);
+        return response;
     }
 
 

@@ -71,7 +71,7 @@ public class User {
         this.id = id;
     }
 
-    public Boolean getModerator() {
+    public boolean isModerator() {
         return isModerator;
     }
 

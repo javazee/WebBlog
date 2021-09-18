@@ -1,6 +1,8 @@
 package main.controller;
 
 import main.api.request.DecisionRequest;
+import main.api.request.PostRequest;
+import main.api.response.AddPostResponse;
 import main.api.response.postsResponse.ListOfPostResponse;
 import main.api.response.postsResponse.PostResponseById;
 import main.api.response.postsResponse.PostsCountByDateResponse;
@@ -85,5 +87,17 @@ public class ApiPostController {
         return HttpStatus.OK;
     }
 
+    @PostMapping("/post")
+    @PreAuthorize("hasAuthority('user:write')")
+    protected ResponseEntity<AddPostResponse> addPost(@RequestBody PostRequest postRequest){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        postService.addPost(
+                                postRequest.getTimestamp(),
+                                postRequest.getActive(),
+                                postRequest.getTitle(),
+                                postRequest.getTags(),
+                                postRequest.getText()));
+    }
 
 }

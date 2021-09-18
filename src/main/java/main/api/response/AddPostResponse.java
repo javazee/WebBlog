@@ -1,4 +1,4 @@
-package main.api.response.authCheckResponse;
+package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.HashMap;
 
 @Data
-public class RegistrationResponse{
+public class AddPostResponse {
 
     private boolean result;
 
