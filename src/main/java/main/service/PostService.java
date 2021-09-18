@@ -160,12 +160,7 @@ public class PostService {
     public PostsCountByDateResponse getCountOfPostsByDate(Integer year){
         List<Integer> years = postRepository.getYears(new Date());
         HashMap<String, Integer> postsCountByDate = new HashMap<>();
-        List<Object[]> posts;
-        if (year == null){
-             posts = postRepository.getPostsCountByDate(Calendar.getInstance().get(Calendar.YEAR));
-        } else {
-             posts = postRepository.getPostsCountByDate(year);
-        }
+        List<Object[]> posts = postRepository.getPostsCountByDate(year == null ? Calendar.getInstance().get(Calendar.YEAR) : year);
         PostsCountByDateResponse postsCountByDateResponse = new PostsCountByDateResponse();
         postsCountByDateResponse.getYears().addAll(years);
         for (Object[] post: posts){
@@ -192,19 +187,16 @@ public class PostService {
         postResponseById.setActive(post.isActive());
         postResponseById.setTitle(post.getTittle());
         postResponseById.setText(post.getText());
-
         if (!(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
             post.setCountOfView(post.getCountOfView() + 1);
             postRepository.save(post);
         }
-
         postResponseById.setViewCount(post.getCountOfView());
         postResponseById.setTimestamp(post.getPublicationTime().getTime() / 1000);
         postResponseById.getUser().setId(post.getUser().getId());
         postResponseById.getUser().setName(post.getUser().getName());
         postResponseById.setLikeCount((int) post.getLikes().stream().filter(p -> p.getValue() == 1).count());
         postResponseById.setDislikeCount((int) post.getLikes().stream().filter(p -> p.getValue() == -1).count());
-
         List<PostComment> comments = postCommentRepository.findAllByPostId(id);
         for (PostComment comment: comments){
             CommentResponse commentResponse = new CommentResponse();
@@ -217,14 +209,13 @@ public class PostService {
             commentResponse.getUser().setPhoto(comment.getUser().getPhotoLink());
             postResponseById.getComments().add(commentResponse);
         }
-
         List<String> tags = tagToPostRepository.findTagsByPostId(id);
         postResponseById.getTags().addAll(tags);
         return postResponseById;
     }
 
 
-    String createAnnounce(String text){
+    private String createAnnounce(String text){
         String noHTMLText = text.replaceAll("\\<.*?\\>", "");
         if (noHTMLText.length() <= 150) return noHTMLText + "...";
         int count = 0;
@@ -236,7 +227,7 @@ public class PostService {
         }
     }
 
-    ListOfPostResponse createPostsList(List<Post> posts){
+    private ListOfPostResponse createPostsList(List<Post> posts){
         ListOfPostResponse listOfPost = new ListOfPostResponse();
         for (Post post : posts) {
             PostResponse postResponse = new PostResponse();

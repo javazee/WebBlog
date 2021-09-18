@@ -4,12 +4,10 @@ import com.github.cage.GCage;
 import main.api.request.LoginRequest;
 import main.api.request.RegistrationRequest;
 import main.api.response.LogoutResponse;
+import main.api.response.authCheckResponse.CaptchaResponse;
+import main.api.response.authCheckResponse.RegistrationResponse;
 import main.api.response.loginResponse.LoginResponse;
 import main.api.response.loginResponse.UserLoginResponse;
-import main.api.response.authCheckResponse.RegistrationErrorResponse;
-import main.api.response.authCheckResponse.CaptchaResponse;
-import main.api.response.authCheckResponse.AuthCheckResponse;
-import main.api.response.authCheckResponse.RegistrationResponse;
 import main.model.CaptchaCode;
 import main.model.User;
 import main.model.repository.CaptchaRepository;
@@ -52,10 +50,6 @@ public class AuthCheckService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthCheckResponse authCheck(){
-        return new AuthCheckResponse();
-    }
-
     public CaptchaResponse getCaptcha(){
         captchaRepository.deleteOldCaptcha(new Date(new Date().getTime() - interval * 60000L));
         GCage gCage = new GCage();
@@ -75,17 +69,15 @@ public class AuthCheckService {
 
     public RegistrationResponse checkFormData(RegistrationRequest registrationRequest){
         captchaRepository.deleteOldCaptcha(new Date(new Date().getTime() - interval * 60000L));
-        RegistrationErrorResponse response = null;
+        RegistrationResponse response = new RegistrationResponse();
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
-            response= new RegistrationErrorResponse();
             response.getInvalidData().put("email", "Этот e-mail уже зарегистрирован");
         }
         if (!Objects.equals(captchaRepository.getCodeBySecretCode(registrationRequest.getSecretCode()),
                 registrationRequest.getCaptcha())){
-            if (response == null) response= new RegistrationErrorResponse();
             response.getInvalidData().put("captcha", "Код с картинки введён неверно");
         }
-        if (response == null) {
+        if (response.getInvalidData().isEmpty()) {
             User user = new User();
             user.setName(registrationRequest.getName());
             user.setEmail(registrationRequest.getEmail());
@@ -94,7 +86,7 @@ public class AuthCheckService {
                             encode(registrationRequest.getPassword()));
             user.setRegistrationDate(new Date());
             userRepository.save(user);
-            return new RegistrationResponse();
+            response.setResult(true);
         }
         return response;
     }
