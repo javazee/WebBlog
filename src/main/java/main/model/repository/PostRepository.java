@@ -84,7 +84,4 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p WHERE p.isActive = 1 AND p.moderationStatus = 'NEW'")
     Page<Post> findNewPostsForModeration(Pageable pageable);
-
-    Optional<Post> findPostById(int id);
-
 }

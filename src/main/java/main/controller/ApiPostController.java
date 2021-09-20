@@ -2,7 +2,7 @@ package main.controller;
 
 import main.api.request.DecisionRequest;
 import main.api.request.PostRequest;
-import main.api.response.AddPostResponse;
+import main.api.response.AddOrEditPostResponse;
 import main.api.response.postsResponse.ListOfPostResponse;
 import main.api.response.postsResponse.PostResponseById;
 import main.api.response.postsResponse.PostsCountByDateResponse;
@@ -89,15 +89,30 @@ public class ApiPostController {
 
     @PostMapping("/post")
     @PreAuthorize("hasAuthority('user:write')")
-    protected ResponseEntity<AddPostResponse> addPost(@RequestBody PostRequest postRequest){
+    protected ResponseEntity<AddOrEditPostResponse> addPost(@RequestBody PostRequest postRequest){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
-                        postService.addPost(
+                        postService.createOrUpdatePost(
                                 postRequest.getTimestamp(),
                                 postRequest.getActive(),
                                 postRequest.getTitle(),
                                 postRequest.getTags(),
-                                postRequest.getText()));
+                                postRequest.getText(),
+                                null));
     }
 
+    @PutMapping("/post/{id}")
+    @PreAuthorize("hasAuthority('user:write')")
+    protected ResponseEntity<AddOrEditPostResponse> editPost(@RequestBody PostRequest postRequest,
+                                                             @PathVariable(required = false) Integer id){
+        return ResponseEntity.status((HttpStatus.OK))
+                .body(
+                        postService.createOrUpdatePost(
+                                postRequest.getTimestamp(),
+                                postRequest.getActive(),
+                                postRequest.getTitle(),
+                                postRequest.getTags(),
+                                postRequest.getText(),
+                                id));
+    }
 }

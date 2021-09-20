@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.HashMap;
 
 @Data
-public class AddPostResponse {
+public class AddOrEditPostResponse {
 
     private boolean result;
 

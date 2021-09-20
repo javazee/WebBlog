@@ -12,6 +12,6 @@ public class ListOfPostResponse {
     private long count ;
 
     @JsonProperty("posts")
-    private List<PostResponse> posts = new ArrayList<>();
+    private List<PostInfoResponse> posts = new ArrayList<>();
 
 }

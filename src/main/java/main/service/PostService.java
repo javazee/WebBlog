@@ -1,6 +1,6 @@
 package main.service;
 
-import main.api.response.AddPostResponse;
+import main.api.response.AddOrEditPostResponse;
 import main.api.response.postsResponse.*;
 import main.model.*;
 import main.model.enums.ModerationStatus;
@@ -177,7 +177,7 @@ public class PostService {
     }
 
     public void moderatePost(int postId, String decision){
-        Optional<Post> post = postRepository.findPostById(postId);
+        Optional<Post> post = postRepository.findById(postId);
         if (post.isPresent()){
             Post moderatedPost = post.get();
             moderatedPost.setModerationStatus(decision.equals("decline") ? ModerationStatus.DECLINED : ModerationStatus.ACCEPTED);
@@ -227,24 +227,40 @@ public class PostService {
         return postResponseById;
     }
 
-    public AddPostResponse addPost(long timestamp, int active, String title, List<String> tags, String text){
+    public AddOrEditPostResponse createOrUpdatePost(long timestamp, int active, String title, List<String> tags, String text,  Integer id){
+        AddOrEditPostResponse response = new AddOrEditPostResponse();
+        Post post;
+        if (id == null){
+            post = new Post();
+        } else {
+            Optional<Post> optional = postRepository.findById(id);
+            if (optional.isPresent()) {
+                post = optional.get();
+            } else {
+                response.getInvalidData().put("id", "Пост по указанному идентификатору не найден");
+                return response;
+            }
+        }
         if (title.length() < 3 || text.length() < 50){
-            AddPostResponse response = new AddPostResponse();
             if (title.length() < 3) response.getInvalidData().put("title", "Заголовок не установлен");
             if (text.length() < 50) response.getInvalidData().put("text", "Текст публикации слишком короткий");
             return response;
         }
-        Post post = new Post();
-        Date currentTime = new Date();
-        post.setPublicationTime((timestamp < currentTime.getTime() / 1000) ? currentTime : new Date(timestamp * 1000));
-        post.setModerationStatus(ModerationStatus.NEW);
-        post.setTittle(title);
-        post.setText(text);
-        post.setActive(active == 1);
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByEmail(email);
         post.setUser(user.get());
+        if (id == null) {
+            post.setModerationStatus(ModerationStatus.NEW);
+        } else if (!user.get().isModerator()){
+            post.setModerationStatus(ModerationStatus.NEW);
+        }
+        Date currentTime = new Date();
+        post.setPublicationTime((timestamp < currentTime.getTime() / 1000) ? currentTime : new Date(timestamp * 1000));
+        post.setTittle(title);
+        post.setText(text);
+        post.setActive(active == 1);
         postRepository.save(post);
+        if (id != null) tagToPostRepository.deleteAllByPost(post);
         for (String tagText : tags){
             Optional<Tag> tag = tagRepository.findByText(tagText);
             TagToPost tagToPost = new TagToPost();
@@ -260,7 +276,6 @@ public class PostService {
             }
             tagToPostRepository.save(tagToPost);
         }
-        AddPostResponse response = new AddPostResponse();
         response.setResult(true);
         return response;
     }
@@ -281,20 +296,20 @@ public class PostService {
     private ListOfPostResponse createPostsList(List<Post> posts){
         ListOfPostResponse listOfPost = new ListOfPostResponse();
         for (Post post : posts) {
-            PostResponse postResponse = new PostResponse();
-            postResponse.setId(post.getId());
-            postResponse.setTimestamp(post.getPublicationTime().getTime() / 1000);
-            postResponse.setTitle(post.getTittle());
-            postResponse.setAnnounce(createAnnounce(post.getText()));
-            postResponse.setViewCount(post.getCountOfView());
-            postResponse.setCommentCount(post.getComments().size());
+            PostInfoResponse postInfoResponse = new PostInfoResponse();
+            postInfoResponse.setId(post.getId());
+            postInfoResponse.setTimestamp(post.getPublicationTime().getTime() / 1000);
+            postInfoResponse.setTitle(post.getTittle());
+            postInfoResponse.setAnnounce(createAnnounce(post.getText()));
+            postInfoResponse.setViewCount(post.getCountOfView());
+            postInfoResponse.setCommentCount(post.getComments().size());
             int likeCount = (int) post.getLikes().stream().filter(p -> p.getValue() == 1).count();
             int dislikeCount = (int) post.getLikes().stream().filter(p -> p.getValue() == -1).count();
-            postResponse.setLikeCount(likeCount);
-            postResponse.setDislikeCount(dislikeCount);
-            postResponse.getUser().setId(post.getUser().getId());
-            postResponse.getUser().setName(post.getUser().getName());
-            listOfPost.getPosts().add(postResponse);
+            postInfoResponse.setLikeCount(likeCount);
+            postInfoResponse.setDislikeCount(dislikeCount);
+            postInfoResponse.getUser().setId(post.getUser().getId());
+            postInfoResponse.getUser().setName(post.getUser().getName());
+            listOfPost.getPosts().add(postInfoResponse);
         }
         return listOfPost;
     }

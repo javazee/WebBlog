@@ -3,7 +3,7 @@ package main.api.response.postsResponse;
 import lombok.Data;
 
 @Data
-public class PostResponse {
+public class PostInfoResponse {
     private int id;
 
     private long timestamp;
