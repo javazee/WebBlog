@@ -2,11 +2,15 @@ package main.controller;
 
 import main.api.request.DecisionRequest;
 import main.api.request.PostRequest;
+import main.api.request.VoteRequest;
 import main.api.response.AddOrEditPostResponse;
+import main.api.response.VoteResponse;
 import main.api.response.postsResponse.ListOfPostResponse;
 import main.api.response.postsResponse.PostResponseById;
 import main.api.response.postsResponse.PostsCountByDateResponse;
 import main.service.PostService;
+import main.service.VoteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +22,12 @@ import org.springframework.web.bind.annotation.*;
 public class ApiPostController {
 
     private final PostService postService;
+    private final VoteService voteService;
 
-    public ApiPostController(PostService postService) {
+    @Autowired
+    public ApiPostController(PostService postService, VoteService voteService) {
         this.postService = postService;
+        this.voteService = voteService;
     }
 
     @GetMapping(path = "/post")
@@ -114,5 +121,17 @@ public class ApiPostController {
                                 postRequest.getTags(),
                                 postRequest.getText(),
                                 id));
+    }
+
+    @PostMapping("post/like")
+    @PreAuthorize("hasAuthority('user:write')")
+    protected ResponseEntity<VoteResponse> like(@RequestBody VoteRequest vote) {
+        return ResponseEntity.status(HttpStatus.OK).body(voteService.like(vote.getPostId()));
+    }
+
+    @PostMapping("post/dislike")
+    @PreAuthorize("hasAuthority('user:write')")
+    protected ResponseEntity<VoteResponse> dislike(@RequestBody VoteRequest vote) {
+        return ResponseEntity.status(HttpStatus.OK).body(voteService.dislike(vote.getPostId()));
     }
 }

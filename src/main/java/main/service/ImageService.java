@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Random;
 
 @Service
-public class GeneralService {
+public class ImageService {
 
     public String loadImage(byte[] image) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(image);
