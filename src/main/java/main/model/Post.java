@@ -47,7 +47,7 @@ public class Post {
 
     @OneToMany
     @JoinColumn(name = "post_id")
-    private List<PostVote> likes;
+    private List<PostVote> votes;
 
     @OneToMany
     @JoinColumn(name = "post_id")
@@ -154,12 +154,12 @@ public class Post {
         this.title = title;
     }
 
-    public List<PostVote> getLikes() {
-        return likes;
+    public List<PostVote> getVotes() {
+        return votes;
     }
 
-    public void setLikes(List<PostVote> likes) {
-        this.likes = likes;
+    public void setVotes(List<PostVote> votes) {
+        this.votes = votes;
     }
 
     public List<PostComment> getComments() {
@@ -183,7 +183,7 @@ public class Post {
                 ", text='" + text +
                 ", countOfView=" + countOfView +
                 ", countOfComment=" + comments.size() +
-                ", countOfLike=" + likes.size() +
+                ", countOfVotes=" + votes.size() +
                 '}';
     }
 }

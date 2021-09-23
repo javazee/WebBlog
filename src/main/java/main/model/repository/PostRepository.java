@@ -1,6 +1,7 @@
 package main.model.repository;
 
 import main.model.Post;
+import main.model.User;
 import main.model.enums.ModerationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -84,4 +84,26 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p WHERE p.isActive = 1 AND p.moderationStatus = 'NEW'")
     Page<Post> findNewPostsForModeration(Pageable pageable);
+
+    @Query(value = "SELECT COUNT(p) FROM Post p " +
+            "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() and p.user = :user")
+    int statsByCountPosts(@Param("user") User user);
+
+    @Query(value = "SELECT COUNT(v) FROM PostVote v " +
+            "WHERE v.post.isActive = 1 AND v.post.publicationTime < CURRENT_TIMESTAMP() " +
+            "AND v.value = 1 AND v.post.user = :user ")
+    int statsByCountLikes(@Param("user") User user);
+
+    @Query(value = "SELECT COUNT(v) FROM PostVote v " +
+            "WHERE v.post.isActive = 1 AND v.post.publicationTime < CURRENT_TIMESTAMP() " +
+            "AND v.value = -1 AND v.post.user = :user ")
+    int statsByCountDislikes(@Param("user") User user);
+
+    @Query(value = "SELECT SUM(p.countOfView) FROM Post p " +
+            "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() AND p.user = :user ")
+    int statsByViewCount(@Param("user") User user);
+
+    @Query(value = "SELECT MIN(p.publicationTime) FROM Post p " +
+            "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() AND p.user = :user ")
+    Date firstPublicationDate(@Param("user") User user);
 }

@@ -208,8 +208,8 @@ public class PostService {
         postResponseById.setTimestamp(post.getPublicationTime().getTime() / 1000);
         postResponseById.getUser().setId(post.getUser().getId());
         postResponseById.getUser().setName(post.getUser().getName());
-        postResponseById.setLikeCount((int) post.getLikes().stream().filter(p -> p.getValue() == 1).count());
-        postResponseById.setDislikeCount((int) post.getLikes().stream().filter(p -> p.getValue() == -1).count());
+        postResponseById.setLikeCount((int) post.getVotes().stream().filter(p -> p.getValue() == 1).count());
+        postResponseById.setDislikeCount((int) post.getVotes().stream().filter(p -> p.getValue() == -1).count());
         List<PostComment> comments = postCommentRepository.findAllByPostId(id);
         for (PostComment comment: comments){
             CommentResponse commentResponse = new CommentResponse();
@@ -303,8 +303,8 @@ public class PostService {
             postInfoResponse.setAnnounce(createAnnounce(post.getText()));
             postInfoResponse.setViewCount(post.getCountOfView());
             postInfoResponse.setCommentCount(post.getComments().size());
-            int likeCount = (int) post.getLikes().stream().filter(p -> p.getValue() == 1).count();
-            int dislikeCount = (int) post.getLikes().stream().filter(p -> p.getValue() == -1).count();
+            int likeCount = (int) post.getVotes().stream().filter(p -> p.getValue() == 1).count();
+            int dislikeCount = (int) post.getVotes().stream().filter(p -> p.getValue() == -1).count();
             postInfoResponse.setLikeCount(likeCount);
             postInfoResponse.setDislikeCount(dislikeCount);
             postInfoResponse.getUser().setId(post.getUser().getId());
