@@ -1,6 +1,7 @@
 package main.controller;
 
 import main.api.request.CommentRequest;
+import main.api.request.EditProfileRequest;
 import main.api.response.*;
 import main.api.response.tagsResponse.TagsResponse;
 import main.model.User;
@@ -32,6 +33,7 @@ public class ApiGeneralController {
     private final StatisticsService statisticsService;
     private final SettingsRepository settingsRepository;
     private final UserRepository userRepository;
+    private final EditProfileService editProfileService;
 
     @Autowired
     public ApiGeneralController(InitResponse initResponse,
@@ -41,7 +43,8 @@ public class ApiGeneralController {
                                 CommentService commentService,
                                 StatisticsService statisticsService,
                                 SettingsRepository settingsRepository,
-                                UserRepository userRepository) {
+                                UserRepository userRepository,
+                                EditProfileService editProfileService) {
         this.initResponse = initResponse;
         this.settingsService = service;
         this.tagsService = tagsService;
@@ -50,6 +53,7 @@ public class ApiGeneralController {
         this.statisticsService = statisticsService;
         this.settingsRepository = settingsRepository;
         this.userRepository = userRepository;
+        this.editProfileService = editProfileService;
     }
 
     @GetMapping("/init")
@@ -101,7 +105,7 @@ public class ApiGeneralController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        return ResponseEntity.status(HttpStatus.OK).body(statisticsService.getStatistics(user.get()));
+        return ResponseEntity.status(HttpStatus.OK).body(statisticsService.getPersonalStatistics(user.get()));
     }
 
      @GetMapping("/statistics/all")
@@ -112,6 +116,18 @@ public class ApiGeneralController {
           if (user.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
           if (Objects.equals(settingsRepository.findByCode("STATISTICS_IS_PUBLIC").getValue(), "NO") &&
                   !user.get().getRole().getPermissions().contains(Permission.MODERATE)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-          return ResponseEntity.status(HttpStatus.OK).body(statisticsService.getStatistics(null));
+          return ResponseEntity.status(HttpStatus.OK).body(statisticsService.getGeneralStatistics());
+     }
+     @PostMapping(value = "/profile/my")
+     @PreAuthorize("hasAuthority('user:write')")
+    protected ResponseEntity<ProfileEditResponse> editProfile(@ModelAttribute("editProfileRequest") EditProfileRequest editProfileRequest) throws IOException {
+         return ResponseEntity
+                 .status(HttpStatus.OK)
+                 .body(editProfileService.editProfile(
+                         editProfileRequest.getPhoto(),
+                         editProfileRequest.getName(),
+                         editProfileRequest.getEmail(),
+                         editProfileRequest.getPassword(),
+                         editProfileRequest.getRemovePhoto()));
      }
 }

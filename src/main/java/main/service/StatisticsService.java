@@ -18,13 +18,26 @@ public class StatisticsService {
         this.postRepository = postRepository;
     }
 
-    public StatisticsResponse getStatistics(User user){
-        int countPosts = postRepository.statsByCountPosts(user);
-        System.out.println(countPosts);
-        int countLikes = postRepository.statsByCountLikes(user);
-        int countDislikes = postRepository.statsByCountDislikes(user);
-        int countOfView = postRepository.statsByViewCount(user);
-        Date date = postRepository.firstPublicationDate(user);
+    public StatisticsResponse getPersonalStatistics(User user){
+        int countPosts = postRepository.personalStatsByCountPosts(user);
+        int countLikes = postRepository.personalStatsByCountLikes(user);
+        int countDislikes = postRepository.personalStatsByCountDislikes(user);
+        int countOfView = postRepository.personalStatsByViewCount(user);
+        Date date = postRepository.firstPublicationDateOfUserPosts(user);
+        return new StatisticsResponse(
+                countPosts,
+                countLikes,
+                countDislikes,
+                countOfView,
+                date.getTime() / 1000);
+    }
+
+    public StatisticsResponse getGeneralStatistics(){
+        int countPosts = postRepository.generalStatsByCountPosts();
+        int countLikes = postRepository.generalStatsByCountLikes();
+        int countDislikes = postRepository.generalStatsByCountDislikes();
+        int countOfView = postRepository.generalStatsByViewCount();
+        Date date = postRepository.firstPublicationDateOfAllPosts();
         return new StatisticsResponse(
                 countPosts,
                 countLikes,

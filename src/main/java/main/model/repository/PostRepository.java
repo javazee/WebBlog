@@ -87,23 +87,38 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT COUNT(p) FROM Post p " +
             "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() and p.user = :user")
-    int statsByCountPosts(@Param("user") User user);
+    int personalStatsByCountPosts(@Param("user") User user);
 
     @Query(value = "SELECT COUNT(v) FROM PostVote v " +
             "WHERE v.post.isActive = 1 AND v.post.publicationTime < CURRENT_TIMESTAMP() " +
             "AND v.value = 1 AND v.post.user = :user ")
-    int statsByCountLikes(@Param("user") User user);
+    int personalStatsByCountLikes(@Param("user") User user);
 
     @Query(value = "SELECT COUNT(v) FROM PostVote v " +
             "WHERE v.post.isActive = 1 AND v.post.publicationTime < CURRENT_TIMESTAMP() " +
             "AND v.value = -1 AND v.post.user = :user ")
-    int statsByCountDislikes(@Param("user") User user);
+    int personalStatsByCountDislikes(@Param("user") User user);
 
     @Query(value = "SELECT SUM(p.countOfView) FROM Post p " +
             "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() AND p.user = :user ")
-    int statsByViewCount(@Param("user") User user);
+    int personalStatsByViewCount(@Param("user") User user);
 
     @Query(value = "SELECT MIN(p.publicationTime) FROM Post p " +
             "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() AND p.user = :user ")
-    Date firstPublicationDate(@Param("user") User user);
+    Date firstPublicationDateOfUserPosts(@Param("user") User user);
+
+    @Query(value = "SELECT COUNT(p) FROM Post p WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP()")
+    int generalStatsByCountPosts();
+
+    @Query(value = "SELECT COUNT(v) FROM PostVote v WHERE v.post.isActive = 1 AND v.post.publicationTime < CURRENT_TIMESTAMP() AND v.value = 1")
+    int generalStatsByCountLikes();
+
+    @Query(value = "SELECT COUNT(v) FROM PostVote v WHERE v.post.isActive = 1 AND v.post.publicationTime < CURRENT_TIMESTAMP() AND v.value = -1")
+    int generalStatsByCountDislikes();
+
+    @Query(value = "SELECT SUM(p.countOfView) FROM Post p WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP()")
+    int generalStatsByViewCount();
+
+    @Query(value = "SELECT MIN(p.publicationTime) FROM Post p WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP()")
+    Date firstPublicationDateOfAllPosts();
 }
