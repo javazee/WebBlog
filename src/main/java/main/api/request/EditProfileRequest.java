@@ -1,12 +1,11 @@
 package main.api.request;
 
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class EditProfileRequest {
+public class EditProfileRequest<T> {
 
-    private MultipartFile photo;
+    private T photo;
 
     private String name;
 

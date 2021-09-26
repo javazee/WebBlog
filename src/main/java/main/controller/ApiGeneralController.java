@@ -11,15 +11,17 @@ import main.model.repository.UserRepository;
 import main.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
+
+import static org.springframework.http.MediaType.*;
 
 @RestController
 @RequestMapping("/api")
@@ -71,7 +73,7 @@ public class ApiGeneralController {
         return tagsService.getTags(query);
     }
 
-    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/image", consumes = {MULTIPART_FORM_DATA_VALUE})
     @PreAuthorize("hasAuthority('user:write')")
     protected ResponseEntity<?> image(@RequestPart MultipartFile image) throws IOException {
         if (Objects.requireNonNull(image.getOriginalFilename()).endsWith(".jpg") ||
@@ -118,9 +120,10 @@ public class ApiGeneralController {
                   !user.get().getRole().getPermissions().contains(Permission.MODERATE)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
           return ResponseEntity.status(HttpStatus.OK).body(statisticsService.getGeneralStatistics());
      }
-     @PostMapping(value = "/profile/my")
+
+     @PostMapping(value = "/profile/my", headers = ("content-type=multipart/form-data"))
      @PreAuthorize("hasAuthority('user:write')")
-    protected ResponseEntity<ProfileEditResponse> editProfile(@ModelAttribute("editProfileRequest") EditProfileRequest editProfileRequest) throws IOException {
+        protected ResponseEntity<ProfileEditResponse> editProfileWithPhoto(@ModelAttribute EditProfileRequest<MultipartFile> editProfileRequest) throws IOException {
          return ResponseEntity
                  .status(HttpStatus.OK)
                  .body(editProfileService.editProfile(
@@ -130,4 +133,17 @@ public class ApiGeneralController {
                          editProfileRequest.getPassword(),
                          editProfileRequest.getRemovePhoto()));
      }
+
+    @PostMapping(value = "/profile/my", headers = ("content-type=application/json"))
+    @PreAuthorize("hasAuthority('user:write')")
+    protected ResponseEntity<ProfileEditResponse> editProfile(@RequestBody EditProfileRequest<String> editProfileRequest) throws IOException {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(editProfileService.editProfile(
+                        null,
+                        editProfileRequest.getName(),
+                        editProfileRequest.getEmail(),
+                        editProfileRequest.getPassword(),
+                        editProfileRequest.getRemovePhoto()));
+    }
 }

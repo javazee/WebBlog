@@ -16,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Random;
 
 @Service
@@ -39,7 +41,7 @@ public class EditProfileService {
         if (name != null) {
             if (name.length() < 3) {
                 response.getErrors().put("name", "Слишком короткое имя");
-            } else if (name.matches("[a-zA-Zа-яА-ЯЁё]+]")){
+            } else if (!name.matches("[a-zA-Zа-яА-ЯЁё\\s]+")){
                 response.getErrors().put("name", "Имя содержит недопустимые символы");
             } else {
                 user.setName(name);
@@ -49,7 +51,7 @@ public class EditProfileService {
             if (email.matches("^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$")) {
                 user.setEmail(email);
             } else {
-                response.getErrors().put("email", "Некорректный введеный электронный адрес");
+                response.getErrors().put("email", "Некорректно введеный электронный адрес");
             }
         }
         if (password != null){
@@ -57,7 +59,10 @@ public class EditProfileService {
                     encode(password);
             user.setPassword(newPassword);
         }
-        if (removePhoto == 1) user.setPhotoLink(null);
+        if (removePhoto == 1) {
+            Files.delete(Path.of(user.getPhotoLink()));
+            user.setPhotoLink(null);
+        }
         if (photo != null) {
             ByteArrayInputStream bis = new ByteArrayInputStream(photo.getBytes());
             BufferedImage image = ImageIO.read(bis);
@@ -71,11 +76,13 @@ public class EditProfileService {
             String path = generatePath();
             File file = new File(path);
             file.mkdirs();
-            user.setPhotoLink("file:///" + file.getAbsolutePath());
+            user.setPhotoLink(file.getAbsolutePath());
             ImageIO.write(newImage, "jpg", file);
         }
-        userRepository.save(user);
-        if (response.getErrors().isEmpty()) response.setResult(true);
+        if (response.getErrors().isEmpty()){
+            userRepository.save(user);
+            response.setResult(true);
+        }
         return response;
     }
 
