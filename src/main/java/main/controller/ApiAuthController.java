@@ -1,11 +1,13 @@
 package main.controller;
 
+import main.api.request.ChangePasswordRequest;
 import main.api.request.LoginRequest;
 import main.api.request.RegistrationRequest;
+import main.api.request.RestoreRequest;
 import main.api.response.LogoutResponse;
 import main.api.response.loginResponse.LoginResponse;
 import main.api.response.authCheckResponse.CaptchaResponse;
-import main.api.response.authCheckResponse.RegistrationResponse;
+import main.api.response.authCheckResponse.AuthResponse;
 import main.service.AuthCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +40,7 @@ public class ApiAuthController {
 
 
     @PostMapping("/register")
-    protected RegistrationResponse register(@RequestBody RegistrationRequest registrationRequest){
+    protected AuthResponse register(@RequestBody RegistrationRequest registrationRequest){
         return service.checkFormData(registrationRequest);
     }
 
@@ -50,5 +52,16 @@ public class ApiAuthController {
     @GetMapping("/logout")
     protected ResponseEntity<LogoutResponse> logout(){
         return ResponseEntity.ok(service.logout());
+    }
+
+    @PostMapping("/password")
+    protected ResponseEntity<AuthResponse> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+        return ResponseEntity.ok(service.changePassword(changePasswordRequest));
+    }
+
+    @PostMapping(value = "/restore")
+    protected AuthResponse restore(@RequestBody RestoreRequest request){
+        System.out.println(request.getEmail());
+        return service.restore(request.getEmail());
     }
 }

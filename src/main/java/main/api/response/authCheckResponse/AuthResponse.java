@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.HashMap;
 
 @Data
-public class RegistrationResponse{
+public class AuthResponse {
 
     private boolean result;
 
