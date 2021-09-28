@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -64,9 +65,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findPostsByTag(@Param("tag") String tag, Pageable pageable);
 
     @Query(value = "SELECT p FROM Post p " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.publicationTime < CURRENT_TIMESTAMP() " +
+            "WHERE p.publicationTime < CURRENT_TIMESTAMP() " +
             "and p.id = :id")
-    Post getPostById(@Param("id") int id);
+    Optional<Post> getPostById(@Param("id") int id);
 
     @Query(value = "SELECT COUNT(p) FROM Post p WHERE p.moderationStatus = 'NEW' and p.isActive = 1")
     int countPostsForModeration();

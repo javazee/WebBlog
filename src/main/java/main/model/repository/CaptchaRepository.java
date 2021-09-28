@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface CaptchaRepository extends JpaRepository<CaptchaCode, Integer> {
@@ -20,4 +21,6 @@ public interface CaptchaRepository extends JpaRepository<CaptchaCode, Integer> {
 
     @Query(value = "SELECT c.code FROM CaptchaCode c WHERE c.secretCode = :code")
     String getCodeBySecretCode(@Param("code") String code);
+
+    boolean existsBySecretCode(String secretCode);
 }

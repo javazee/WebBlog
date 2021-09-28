@@ -1,6 +1,7 @@
 package main.service;
 
 import main.api.response.AddOrEditPostResponse;
+import main.api.response.ModerationResponse;
 import main.api.response.postsResponse.*;
 import main.model.*;
 import main.model.enums.ModerationStatus;
@@ -22,26 +23,25 @@ public class PostService {
 
 
     private final PostRepository postRepository;
-
     private final PostCommentRepository postCommentRepository;
-
     private final TagToPostRepository tagToPostRepository;
-
     private final TagRepository tagRepository;
-
     private final UserRepository userRepository;
+    private final SettingsRepository settingsRepository;
 
     @Autowired
     public PostService(PostRepository postRepository,
                        PostCommentRepository postCommentRepository,
                        TagToPostRepository tagToPostRepository,
                        TagRepository tagRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       SettingsRepository settingsRepository) {
         this.postRepository = postRepository;
         this.postCommentRepository = postCommentRepository;
         this.tagToPostRepository = tagToPostRepository;
         this.tagRepository = tagRepository;
         this.userRepository = userRepository;
+        this.settingsRepository = settingsRepository;
     }
 
     public ListOfPostResponse listPosts(int offset, int limit, String mode) {
@@ -176,8 +176,9 @@ public class PostService {
         return postsCountByDateResponse;
     }
 
-    public void moderatePost(int postId, String decision){
+    public ModerationResponse moderatePost(int postId, String decision){
         Optional<Post> post = postRepository.findById(postId);
+        ModerationResponse response = new ModerationResponse();
         if (post.isPresent()){
             Post moderatedPost = post.get();
             moderatedPost.setModerationStatus(decision.equals("decline") ? ModerationStatus.DECLINED : ModerationStatus.ACCEPTED);
@@ -185,12 +186,19 @@ public class PostService {
             Optional<User> user = userRepository.findByEmail(email);
             moderatedPost.addModerator(user.get());
             postRepository.save(moderatedPost);
+            response.setResult(true);
         }
+        return response;
     }
 
     public PostResponseById getPostById(Integer id){
-        Post post = postRepository.getPostById(id);
-         if (post == null) return null;
+        Optional<Post> opt = postRepository.getPostById(id);
+        if (opt.isEmpty()) return null;
+        Post post = opt.get();
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!post.getUser().getEmail().equals(currentUserEmail)) {
+            if (!post.isActive() && post.getModerationStatus() != ModerationStatus.ACCEPTED ) return null;
+        }
         PostResponseById postResponseById = new PostResponseById();
         postResponseById.setId(post.getId());
         postResponseById.setActive(post.isActive());
@@ -249,10 +257,10 @@ public class PostService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByEmail(email);
         post.setUser(user.get());
-        if (id == null) {
-            post.setModerationStatus(ModerationStatus.NEW);
-        } else if (!user.get().isModerator()){
-            post.setModerationStatus(ModerationStatus.NEW);
+        if (settingsRepository.findByCode("POST_PREMODERATION").getValue().equals("YES")) {
+            post.setModerationStatus(user.get().isModerator() ? ModerationStatus.ACCEPTED : ModerationStatus.NEW);
+        } else {
+            post.setModerationStatus(ModerationStatus.ACCEPTED);
         }
         Date currentTime = new Date();
         post.setPublicationTime((timestamp < currentTime.getTime() / 1000) ? currentTime : new Date(timestamp * 1000));

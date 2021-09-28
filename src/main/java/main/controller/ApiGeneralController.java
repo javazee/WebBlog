@@ -1,8 +1,11 @@
 package main.controller;
 
 import main.api.request.CommentRequest;
+import main.api.request.DecisionRequest;
 import main.api.request.EditProfileRequest;
+import main.api.request.GlobalSettingsRequest;
 import main.api.response.*;
+import main.api.response.postsResponse.PostsCountByDateResponse;
 import main.api.response.tagsResponse.TagsResponse;
 import main.model.User;
 import main.model.enums.Permission;
@@ -30,32 +33,35 @@ public class ApiGeneralController {
     private final InitResponse initResponse;
     private final SettingsService settingsService;
     private final TagsService tagsService;
-    private final ImageService generalService;
+    private final ImageService imageService;
     private final CommentService commentService;
     private final StatisticsService statisticsService;
     private final SettingsRepository settingsRepository;
     private final UserRepository userRepository;
     private final EditProfileService editProfileService;
+    private final PostService postService;
 
     @Autowired
     public ApiGeneralController(InitResponse initResponse,
                                 SettingsService service,
                                 TagsService tagsService,
-                                ImageService generalService,
+                                ImageService imageService,
                                 CommentService commentService,
                                 StatisticsService statisticsService,
                                 SettingsRepository settingsRepository,
                                 UserRepository userRepository,
-                                EditProfileService editProfileService) {
+                                EditProfileService editProfileService,
+                                PostService postService) {
         this.initResponse = initResponse;
         this.settingsService = service;
         this.tagsService = tagsService;
-        this.generalService = generalService;
+        this.imageService = imageService;
         this.commentService = commentService;
         this.statisticsService = statisticsService;
         this.settingsRepository = settingsRepository;
         this.userRepository = userRepository;
         this.editProfileService = editProfileService;
+        this.postService = postService;
     }
 
     @GetMapping("/init")
@@ -68,18 +74,31 @@ public class ApiGeneralController {
         return settingsService.getGlobalSettings();
     }
 
+    @PutMapping("/settings")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    protected HttpStatus setGlobalSettings(@RequestBody GlobalSettingsRequest request){
+        settingsService.setGlobalSettings(request);
+        return HttpStatus.OK;
+    }
+
     @GetMapping("/tag")
     protected TagsResponse tags(@RequestParam(required = false) String query){
         return tagsService.getTags(query);
     }
 
-    @PostMapping(value = "/image", consumes = {MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/image", consumes = MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('user:write')")
-    protected ResponseEntity<?> image(@RequestPart MultipartFile image) throws IOException {
+    protected ResponseEntity<?> image(@RequestPart MultipartFile image) {
         if (Objects.requireNonNull(image.getOriginalFilename()).endsWith(".jpg") ||
                 image.getOriginalFilename().endsWith(".png")){
             if (image.getSize() < 1000000) {
-                return ResponseEntity.status(HttpStatus.OK).body(generalService.loadImage(image.getBytes()));
+                try {
+                    String path = imageService.loadImage(image.getBytes());
+                    return ResponseEntity.status(HttpStatus.OK).body(path);
+                } catch (IOException ex){
+                    ex.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
             } else {
                 ImageResponse imageResponse = new ImageResponse();
                 imageResponse.getInvalidData().put("image", "Размер файла превышает допустимый размер");
@@ -136,7 +155,7 @@ public class ApiGeneralController {
 
     @PostMapping(value = "/profile/my", headers = ("content-type=application/json"))
     @PreAuthorize("hasAuthority('user:write')")
-    protected ResponseEntity<ProfileEditResponse> editProfile(@RequestBody EditProfileRequest<String> editProfileRequest) throws IOException {
+    protected ResponseEntity<ProfileEditResponse> editProfile(@RequestBody EditProfileRequest<String> editProfileRequest){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(editProfileService.editProfile(
@@ -145,5 +164,16 @@ public class ApiGeneralController {
                         editProfileRequest.getEmail(),
                         editProfileRequest.getPassword(),
                         editProfileRequest.getRemovePhoto()));
+    }
+
+    @GetMapping("/calendar")
+    protected PostsCountByDateResponse getCountOfPostsByDate(@RequestParam(required = false) Integer year){
+        return postService.getCountOfPostsByDate(year);
+    }
+
+    @PostMapping("/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    protected ModerationResponse moderatePost(@RequestBody DecisionRequest decision){
+        return postService.moderatePost(decision.getId(), decision.getDecision());
     }
 }

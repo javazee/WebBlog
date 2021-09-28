@@ -34,7 +34,7 @@ public class EditProfileService {
                                            String name,
                                            String email,
                                            String password,
-                                           int removePhoto) throws IOException {
+                                           int removePhoto){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(username).get();
         ProfileEditResponse response = new ProfileEditResponse();
@@ -60,24 +60,32 @@ public class EditProfileService {
             user.setPassword(newPassword);
         }
         if (removePhoto == 1) {
-            Files.delete(Path.of(user.getPhotoLink()));
-            user.setPhotoLink(null);
+            try {
+                Files.delete(Path.of(user.getPhotoLink()));
+                user.setPhotoLink(null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         if (photo != null) {
-            ByteArrayInputStream bis = new ByteArrayInputStream(photo.getBytes());
-            BufferedImage image = ImageIO.read(bis);
-            int width = image.getWidth();
-            int height = image.getHeight();
-            int minSide = Math.min(width, height);
-            int x = (width - minSide) / 2;
-            int y = (height - minSide) / 2;
-            BufferedImage cutImage = image.getSubimage(x, y, minSide, minSide);
-            BufferedImage newImage = Scalr.resize(cutImage,  36);
-            String path = generatePath();
-            File file = new File(path);
-            file.mkdirs();
-            user.setPhotoLink(file.getAbsolutePath());
-            ImageIO.write(newImage, "jpg", file);
+            try {
+                ByteArrayInputStream bis = new ByteArrayInputStream(photo.getBytes());
+                BufferedImage image = ImageIO.read(bis);
+                int width = image.getWidth();
+                int height = image.getHeight();
+                int minSide = Math.min(width, height);
+                int x = (width - minSide) / 2;
+                int y = (height - minSide) / 2;
+                BufferedImage cutImage = image.getSubimage(x, y, minSide, minSide);
+                BufferedImage newImage = Scalr.resize(cutImage,  36);
+                String path = generatePath();
+                File file = new File(path);
+                file.mkdirs();
+                ImageIO.write(newImage, "jpg", file);
+                user.setPhotoLink(file.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         if (response.getErrors().isEmpty()){
             userRepository.save(user);

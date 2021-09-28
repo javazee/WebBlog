@@ -5,9 +5,10 @@ import main.api.request.LoginRequest;
 import main.api.request.RegistrationRequest;
 import main.api.request.RestoreRequest;
 import main.api.response.LogoutResponse;
-import main.api.response.loginResponse.LoginResponse;
-import main.api.response.authCheckResponse.CaptchaResponse;
 import main.api.response.authCheckResponse.AuthResponse;
+import main.api.response.authCheckResponse.CaptchaResponse;
+import main.api.response.loginResponse.LoginResponse;
+import main.model.repository.SettingsRepository;
 import main.service.AuthCheckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,12 @@ import java.security.Principal;
 public class ApiAuthController {
 
     private final AuthCheckService service;
+    private final SettingsRepository settingsRepository;
 
     @Autowired
-    public ApiAuthController(AuthCheckService service) {
+    public ApiAuthController(AuthCheckService service, SettingsRepository settingsRepository) {
         this.service = service;
+        this.settingsRepository = settingsRepository;
     }
 
     @GetMapping("/check")
@@ -40,8 +43,10 @@ public class ApiAuthController {
 
 
     @PostMapping("/register")
-    protected AuthResponse register(@RequestBody RegistrationRequest registrationRequest){
-        return service.checkFormData(registrationRequest);
+    protected ResponseEntity<AuthResponse> register(@RequestBody RegistrationRequest registrationRequest){
+        if (settingsRepository.findByCode("MULTIUSER_MODE").getValue().equals("NO"))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.ok().body(service.checkFormData(registrationRequest));
     }
 
     @PostMapping("/login")
@@ -61,7 +66,6 @@ public class ApiAuthController {
 
     @PostMapping(value = "/restore")
     protected AuthResponse restore(@RequestBody RestoreRequest request){
-        System.out.println(request.getEmail());
         return service.restore(request.getEmail());
     }
 }
