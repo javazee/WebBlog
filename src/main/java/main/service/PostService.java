@@ -100,6 +100,7 @@ public class PostService {
         Page<Post> posts;
         int page = offset / limit;
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> user = userRepository.findByEmail(email);
         switch (status) {
             case "pending":
                 posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
@@ -116,12 +117,13 @@ public class PostService {
             case "published":
                 posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
                         true,
-                        ModerationStatus.ACCEPTED, email);
+                        ModerationStatus.ACCEPTED,
+                        email);
                 break;
             default:
                 posts = postRepository.getMyPosts(PageRequest.of(page, limit, Sort.by("publicationTime")),
                         false,
-                        ModerationStatus.NEW,
+                        user.get().isModerator() ? ModerationStatus.ACCEPTED : ModerationStatus.NEW,
                         email);
         }
         if (posts.isEmpty()) return new ListOfPostResponse();
@@ -192,12 +194,14 @@ public class PostService {
     }
 
     public PostResponseById getPostById(Integer id){
-        Optional<Post> opt = postRepository.getPostById(id);
+        Optional<Post> opt = postRepository.findPostById(id);
         if (opt.isEmpty()) return null;
         Post post = opt.get();
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!post.getUser().getEmail().equals(currentUserEmail)) {
-            if (!post.isActive() && post.getModerationStatus() != ModerationStatus.ACCEPTED ) return null;
+            if (!post.isActive()
+                    && post.getModerationStatus() != ModerationStatus.ACCEPTED
+                    && post.getPublicationTime().after(new Date())) return null;
         }
         PostResponseById postResponseById = new PostResponseById();
         postResponseById.setId(post.getId());

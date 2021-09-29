@@ -64,10 +64,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "and t.text like %:tag% GROUP BY p")
     Page<Post> findPostsByTag(@Param("tag") String tag, Pageable pageable);
 
-    @Query(value = "SELECT p FROM Post p " +
-            "WHERE p.publicationTime < CURRENT_TIMESTAMP() " +
-            "and p.id = :id")
-    Optional<Post> getPostById(@Param("id") int id);
+    Optional<Post> findPostById(@Param("id") int id);
 
     @Query(value = "SELECT COUNT(p) FROM Post p WHERE p.moderationStatus = 'NEW' and p.isActive = 1")
     int countPostsForModeration();
