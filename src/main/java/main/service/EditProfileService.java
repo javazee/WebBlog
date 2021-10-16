@@ -1,10 +1,12 @@
 package main.service;
 
+import com.cloudinary.Cloudinary;
 import main.api.response.ProfileEditResponse;
 import main.model.User;
 import main.model.repository.UserRepository;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,17 +15,28 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 @Service
 public class EditProfileService {
 
     private final UserRepository userRepository;
+
+    @Value("${cloadinary.cloud_name}")
+    private String cloadinaryName;
+
+    @Value("${cloadinary.api_key}")
+    private String cloadinaryApiKey;
+
+    @Value("${cloadinary.api_secret}")
+    private String cloadinaryApiSecret;
 
     @Autowired
     public EditProfileService(UserRepository userRepository) {
@@ -67,7 +80,7 @@ public class EditProfileService {
                 e.printStackTrace();
             }
         }
-        if (photo != null) {
+        if (response.getErrors().isEmpty() && photo != null) {
             try {
                 ByteArrayInputStream bis = new ByteArrayInputStream(photo.getBytes());
                 BufferedImage image = ImageIO.read(bis);
@@ -78,12 +91,23 @@ public class EditProfileService {
                 int y = (height - minSide) / 2;
                 BufferedImage cutImage = image.getSubimage(x, y, minSide, minSide);
                 BufferedImage newImage = Scalr.resize(cutImage,  36);
+                Map<String, String> config = new HashMap<>();
+                config.put("cloud_name", cloadinaryName);
+                config.put("api_key", cloadinaryApiKey);
+                config.put("api_secret", cloadinaryApiSecret);
+                Cloudinary cloudinary = new Cloudinary(config);
+                HashMap<String, String> param = new HashMap<>();
                 String path = generatePath();
-                File file = new File(path);
-                file.mkdirs();
-                ImageIO.write(newImage, "jpg", file);
-                user.setPhotoLink(file.getAbsolutePath());
+                param.put("public_id", path);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(newImage, "jpg", baos);
+                cloudinary.uploader().upload(baos.toByteArray(), param);
+                user.setPhotoLink(cloudinary.url().generate(path + ".jpg"));
             } catch (IOException e) {
+                response.getErrors().put("photo", "Ошибка при обработке фотографии");
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                response.getErrors().put("photo", "Неверный формат фотографии");
                 e.printStackTrace();
             }
         }
@@ -96,12 +120,11 @@ public class EditProfileService {
 
     private static String generatePath() throws UnknownHostException {
         String characters = "abcdefghijklmnopqrstuvwxyz1234567890";
-        StringBuilder sb = new StringBuilder("profilePhoto/");
+        StringBuilder sb = new StringBuilder();
         Random random = new Random();
         for (int i = 0; i < 12; i++) {
             sb.append(characters.charAt(random.nextInt(characters.length())));
         }
-        sb.append(".jpg");
         return sb.toString();
     }
 

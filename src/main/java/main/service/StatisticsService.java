@@ -19,30 +19,30 @@ public class StatisticsService {
     }
 
     public StatisticsResponse getPersonalStatistics(User user){
-        int countPosts = postRepository.personalStatsByCountPosts(user);
-        int countLikes = postRepository.personalStatsByCountLikes(user);
-        int countDislikes = postRepository.personalStatsByCountDislikes(user);
-        int countOfView = postRepository.personalStatsByViewCount(user);
+        StatisticsResponse response = new StatisticsResponse();
+        response.setPostsCount(postRepository.personalStatsByCountPosts(user));
+        response.setLikesCount(postRepository.personalStatsByCountLikes(user));
+        response.setDislikesCount(postRepository.personalStatsByCountDislikes(user));
+        Integer countOfView = postRepository.personalStatsByViewCount(user);
+        response.setViewsCount(countOfView == null ? 0 : countOfView);
         Date date = postRepository.firstPublicationDateOfUserPosts(user);
-        return new StatisticsResponse(
-                countPosts,
-                countLikes,
-                countDislikes,
-                countOfView,
-                date.getTime() / 1000);
+        if (date != null){
+            response.setFirstPublication(date.getTime() / 1000);
+        }
+        return response;
     }
 
     public StatisticsResponse getGeneralStatistics(){
-        int countPosts = postRepository.generalStatsByCountPosts();
-        int countLikes = postRepository.generalStatsByCountLikes();
-        int countDislikes = postRepository.generalStatsByCountDislikes();
-        int countOfView = postRepository.generalStatsByViewCount();
+        StatisticsResponse response = new StatisticsResponse();
+        response.setPostsCount(postRepository.generalStatsByCountPosts());
+        response.setLikesCount(postRepository.generalStatsByCountLikes());
+        response.setDislikesCount(postRepository.generalStatsByCountDislikes());
+        Integer countOfView = postRepository.generalStatsByViewCount();
+        response.setViewsCount(countOfView == null ? 0 : countOfView);
         Date date = postRepository.firstPublicationDateOfAllPosts();
-        return new StatisticsResponse(
-                countPosts,
-                countLikes,
-                countDislikes,
-                countOfView,
-                date.getTime() / 1000);
+        if (date != null){
+            response.setFirstPublication(date.getTime() / 1000);
+        }
+        return response;
     }
 }

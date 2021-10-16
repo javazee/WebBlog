@@ -299,6 +299,7 @@ public class PostService {
         int count = 0;
         while (true){
             int index = noHTMLText.indexOf(" ", count + 1);
+            if (index == -1) return noHTMLText.substring(0, 150) + "...";
             if (index < 150) {
                 count = index;
             } else return noHTMLText.substring(0, count) + "...";

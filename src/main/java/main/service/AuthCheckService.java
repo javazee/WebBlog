@@ -39,6 +39,9 @@ public class AuthCheckService {
     @Value("${appEmail.email}")
     private String emailFrom;
 
+    @Value("${blog.url}")
+    private String url;
+
 
     private final JavaMailSender emailSender;
 
@@ -136,7 +139,7 @@ public class AuthCheckService {
                 user.get().setRecoveryCode(code);
                 userRepository.save(user.get());
                 messageHelper.setText("To change your password, please " +
-                        "<a href='http://localhost:8080/login/change-password/" + code + "'>click here</a>", true);
+                        "<a href='" + url + "/login/change-password/" + code + "'>click here</a>", true);
                 emailSender.send(mimeMessage);
                 response.setResult(true);
             }

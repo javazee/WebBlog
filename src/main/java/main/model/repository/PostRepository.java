@@ -99,7 +99,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT SUM(p.countOfView) FROM Post p " +
             "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() AND p.user = :user ")
-    int personalStatsByViewCount(@Param("user") User user);
+    Integer personalStatsByViewCount(@Param("user") User user);
 
     @Query(value = "SELECT MIN(p.publicationTime) FROM Post p " +
             "WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP() AND p.user = :user ")
@@ -115,7 +115,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     int generalStatsByCountDislikes();
 
     @Query(value = "SELECT SUM(p.countOfView) FROM Post p WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP()")
-    int generalStatsByViewCount();
+    Integer generalStatsByViewCount();
 
     @Query(value = "SELECT MIN(p.publicationTime) FROM Post p WHERE p.isActive = 1 AND p.publicationTime < CURRENT_TIMESTAMP()")
     Date firstPublicationDateOfAllPosts();
