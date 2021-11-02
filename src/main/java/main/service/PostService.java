@@ -186,7 +186,7 @@ public class PostService {
             moderatedPost.setModerationStatus(decision.equals("decline") ? ModerationStatus.DECLINED : ModerationStatus.ACCEPTED);
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
             Optional<User> user = userRepository.findByEmail(email);
-            moderatedPost.addModerator(user.get());
+            if (!moderatedPost.getModerators().contains(user.get())) moderatedPost.addModerator(user.get());
             postRepository.save(moderatedPost);
             response.setResult(true);
         }
