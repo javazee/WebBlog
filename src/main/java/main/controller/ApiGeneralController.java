@@ -143,15 +143,28 @@ public class ApiGeneralController {
 
      @PostMapping(value = "/profile/my", headers = ("content-type=multipart/form-data"))
      @PreAuthorize("hasAuthority('user:write')")
-        protected ResponseEntity<ProfileEditResponse> editProfileWithPhoto(@ModelAttribute EditProfileRequest<MultipartFile> editProfileRequest) throws IOException {
-         return ResponseEntity
-                 .status(HttpStatus.OK)
-                 .body(editProfileService.editProfile(
-                         editProfileRequest.getPhoto(),
-                         editProfileRequest.getName(),
-                         editProfileRequest.getEmail(),
-                         editProfileRequest.getPassword(),
-                         editProfileRequest.getRemovePhoto()));
+        protected ResponseEntity<ProfileEditResponse> editProfileWithPhoto(@ModelAttribute EditProfileRequest<MultipartFile> editProfileRequest){
+         if (Objects.requireNonNull(editProfileRequest.getPhoto().getOriginalFilename()).endsWith(".jpg") ||
+                 editProfileRequest.getPhoto().getOriginalFilename().endsWith(".png")){
+             if (editProfileRequest.getPhoto().getSize() < 4000000) {
+                 return ResponseEntity
+                         .status(HttpStatus.OK)
+                         .body(editProfileService.editProfile(
+                                 editProfileRequest.getPhoto(),
+                                 editProfileRequest.getName(),
+                                 editProfileRequest.getEmail(),
+                                 editProfileRequest.getPassword(),
+                                 editProfileRequest.getRemovePhoto()));
+             } else {
+                 ProfileEditResponse response = new ProfileEditResponse();
+                 response.getErrors().put("image", "Размер файла превышает допустимый размер");
+                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+             }
+         } else {
+             ProfileEditResponse response = new ProfileEditResponse();
+             response.getErrors().put("type", "файл не формата изображения jpg или png");
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+         }
      }
 
     @PostMapping(value = "/profile/my", headers = ("content-type=application/json"))
