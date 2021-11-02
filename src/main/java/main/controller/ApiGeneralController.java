@@ -1,5 +1,6 @@
 package main.controller;
 
+import liquibase.util.file.FilenameUtils;
 import main.api.request.CommentRequest;
 import main.api.request.DecisionRequest;
 import main.api.request.EditProfileRequest;
@@ -91,9 +92,9 @@ public class ApiGeneralController {
     protected ResponseEntity<?> image(@RequestPart MultipartFile image) {
         if (Objects.requireNonNull(image.getOriginalFilename()).endsWith(".jpg") ||
                 image.getOriginalFilename().endsWith(".png")){
-            if (image.getSize() < 1000000) {
+            if (image.getSize() < 4000000) {
                 try {
-                    String path = imageService.loadImage(image.getBytes());
+                    String path = imageService.loadImage(image.getBytes(), FilenameUtils.getExtension(image.getOriginalFilename()));
                     return ResponseEntity.status(HttpStatus.OK).body(path);
                 } catch (IOException ex){
                     ex.printStackTrace();

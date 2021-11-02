@@ -1,6 +1,7 @@
 package main.service;
 
 import com.cloudinary.Cloudinary;
+import liquibase.util.file.FilenameUtils;
 import main.api.response.ProfileEditResponse;
 import main.model.User;
 import main.model.repository.UserRepository;
@@ -18,10 +19,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -73,12 +73,7 @@ public class EditProfileService {
             user.setPassword(newPassword);
         }
         if (removePhoto == 1) {
-            try {
-                Files.delete(Path.of(user.getPhotoLink()));
-                user.setPhotoLink(null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            user.setPhotoLink(null);
         }
         if (response.getErrors().isEmpty() && photo != null) {
             try {
@@ -100,7 +95,7 @@ public class EditProfileService {
                 String path = generatePath();
                 param.put("public_id", path);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(newImage, "jpg", baos);
+                ImageIO.write(newImage, Objects.requireNonNull(FilenameUtils.getExtension(photo.getOriginalFilename())), baos);
                 cloudinary.uploader().upload(baos.toByteArray(), param);
                 user.setPhotoLink(cloudinary.url().generate(path + ".jpg"));
             } catch (IOException e) {
